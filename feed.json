@@ -10,8 +10,8 @@
     },
     "items": [
         {
-            "id": "https://teknozat.com/merhaba.html",
-            "url": "https://teknozat.com/merhaba.html",
+            "id": "https://teknozat.com/merhaba/",
+            "url": "https://teknozat.com/merhaba/",
             "title": "Merhaba!",
             "summary": "Bu yeni teknozatın ilk yazısı. ",
             "content_html": "<p>Bu yeni teknozatın ilk yazısı. </p>",
