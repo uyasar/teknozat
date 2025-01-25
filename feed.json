@@ -10,8 +10,8 @@
     },
     "items": [
         {
-            "id": "https://teknozat.com/merhaba/",
-            "url": "https://teknozat.com/merhaba/",
+            "id": "https://teknozat.com/pubii-ile-web-sitesi-olusturma/",
+            "url": "https://teknozat.com/pubii-ile-web-sitesi-olusturma/",
             "title": "Publii İle Süper Hızlı Web Sitesi Nasıl Açılır?",
             "summary": "Publii bir statik web sitesi oluşturucu diyebileceğimiz bir içerik yönetim sistemi. Diğer içerik yönetim sistemlerinin aksine, dosyaları bir sunucuya yükleyip cms'yi oradan yönetmiyoruz. Bilgisyaraımıza kurduğumuz bir program vasıtasıyla sitemizi hazırlayıp bunu istediğimiz yerde barındırıyoruz. Bir çok ücretsiz seçenek mevcut. Bu sistemin olumlu tarafı html tabanlı&hellip;",
             "content_html": "<p>Publii bir statik web sitesi oluşturucu diyebileceğimiz bir içerik yönetim sistemi. Diğer içerik yönetim sistemlerinin aksine, dosyaları bir sunucuya yükleyip cms'yi oradan yönetmiyoruz. Bilgisyaraımıza kurduğumuz bir program vasıtasıyla sitemizi hazırlayıp bunu istediğimiz yerde barındırıyoruz. Bir çok ücretsiz seçenek mevcut. </p>\n<p>Bu sistemin olumlu tarafı html tabanlı sayfalar ürettiği için çok hızlı ve seo uyumlu. Ayrıca herhangi bir veritabanı ve ya dinamik dosya barındırmadığı için daha güvenli.</p>\n<p> </p>\n<p>Publii, kullanım kolaylığı ile statik web sitelerinin performans avantajlarını bir araya getiren yenilikçi bir statik site CMS’idir. Kodlama bilgisi veya karmaşık kurulumlar gerektiren birçok statik site üreticisinin aksine, Publii; WordPress veya Joomla! gibi sunucu tabanlı CMS platformlarına benzer sezgisel bir kullanıcı arayüzü sunar. Bu arayüz sayesinde kullanıcılar, teknik zorluklarla uğraşmadan içerik oluşturabilir, yayınlayabilir ve önceden hazırlanmış temalarla sitelerini özelleştirebilirler.</p>\n<p>Publii’yi benzersiz kılan, tamamen masaüstünüzde çalışmasıdır. Windows, Mac veya Linux fark etmeksizin, uygulamayı bilgisayarınıza kurduktan sonra internet bağlantısına ihtiyaç duymadan sitenizi oluşturabilir veya düzenleyebilirsiniz. Hazır olduğunuzda, sitenizi yayınlamak tek bir tıkla mümkündür. Publii; HTTP/HTTPS sunucuları, Netlify, Amazon S3, GitHub Pages, Google Cloud ve SFTP gibi birçok yükleme seçeneğini destekler.</p>\n<p>Kısacası, Publii; statik sitelerin hız, güvenlik ve sadeliğini, masaüstü tabanlı bir CMS’nin kullanım kolaylığı ve esnekliği ile birleştiriyor.</p>",
@@ -22,7 +22,7 @@
             "tags": [
             ],
             "date_published": "2025-01-25T13:21:34+03:00",
-            "date_modified": "2025-01-25T13:55:03+03:00"
+            "date_modified": "2025-01-25T16:25:57+03:00"
         }
     ]
 }
