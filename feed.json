@@ -1,0 +1,27 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "title": "Teknozat",
+    "description": "",
+    "home_page_url": "https://teknozat.com",
+    "feed_url": "https://teknozat.com/feed.json",
+    "user_comment": "",
+    "author": {
+        "name": "U. Yazar"
+    },
+    "items": [
+        {
+            "id": "https://teknozat.com/merhaba.html",
+            "url": "https://teknozat.com/merhaba.html",
+            "title": "Merhaba!",
+            "summary": "Bu yeni teknozatın ilk yazısı. ",
+            "content_html": "<p>Bu yeni teknozatın ilk yazısı. </p>",
+            "author": {
+                "name": "U. Yazar"
+            },
+            "tags": [
+            ],
+            "date_published": "2025-01-25T13:21:34+03:00",
+            "date_modified": "2025-01-25T13:21:34+03:00"
+        }
+    ]
+}

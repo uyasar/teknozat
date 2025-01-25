@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+    <title>Teknozat</title>
+    <link href="https://teknozat.com/feed.xml" rel="self" />
+    <link href="https://teknozat.com" />
+    <updated>2025-01-25T13:21:34+03:00</updated>
+    <author>
+        <name>U. Yazar</name>
+    </author>
+    <id>https://teknozat.com</id>
+
+    <entry>
+        <title>Merhaba!</title>
+        <author>
+            <name>U. Yazar</name>
+        </author>
+        <link href="https://teknozat.com/merhaba.html"/>
+        <id>https://teknozat.com/merhaba.html</id>
+
+        <updated>2025-01-25T13:21:34+03:00</updated>
+            <summary>
+                <![CDATA[
+                    Bu yeni teknozatın ilk yazısı. 
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <p>Bu yeni teknozatın ilk yazısı. </p>
+            ]]>
+        </content>
+    </entry>
+</feed>
