@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
     <title>Teknozat</title>
-    <link href="https://teknozat.com/feed.xml" rel="self" />
-    <link href="https://teknozat.com" />
+    <link href="https://uyasar.github.io/teknozat/feed.xml" rel="self" />
+    <link href="https://uyasar.github.io/teknozat" />
     <updated>2025-01-25T13:55:03+03:00</updated>
     <author>
         <name>U. Yazar</name>
     </author>
-    <id>https://teknozat.com</id>
+    <id>https://uyasar.github.io/teknozat</id>
 
     <entry>
         <title>Publii İle Süper Hızlı Web Sitesi Nasıl Açılır?</title>
         <author>
             <name>U. Yazar</name>
         </author>
-        <link href="https://teknozat.com/merhaba/"/>
-        <id>https://teknozat.com/merhaba/</id>
-        <media:content url="https://teknozat.com/media/posts/1/publii.png" medium="image" />
+        <link href="https://uyasar.github.io/teknozat/merhaba/"/>
+        <id>https://uyasar.github.io/teknozat/merhaba/</id>
+        <media:content url="https://uyasar.github.io/teknozat/media/posts/1/publii.png" medium="image" />
 
         <updated>2025-01-25T13:21:34+03:00</updated>
             <summary>
                 <![CDATA[
-                        <img src="https://teknozat.com/media/posts/1/publii.png" alt="" />
+                        <img src="https://uyasar.github.io/teknozat/media/posts/1/publii.png" alt="" />
                     Publii bir statik web sitesi oluşturucu diyebileceğimiz bir içerik yönetim sistemi. Diğer içerik yönetim sistemlerinin aksine, dosyaları bir sunucuya yükleyip cms'yi oradan yönetmiyoruz. Bilgisyaraımıza kurduğumuz bir program vasıtasıyla sitemizi hazırlayıp bunu istediğimiz yerde barındırıyoruz. Bir çok ücretsiz seçenek mevcut. Bu sistemin olumlu tarafı html tabanlı&hellip;
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
-                    <p><img src="https://teknozat.com/media/posts/1/publii.png" class="type:primaryImage" alt="" /></p>
+                    <p><img src="https://uyasar.github.io/teknozat/media/posts/1/publii.png" class="type:primaryImage" alt="" /></p>
                 <p>Publii bir statik web sitesi oluşturucu diyebileceğimiz bir içerik yönetim sistemi. Diğer içerik yönetim sistemlerinin aksine, dosyaları bir sunucuya yükleyip cms'yi oradan yönetmiyoruz. Bilgisyaraımıza kurduğumuz bir program vasıtasıyla sitemizi hazırlayıp bunu istediğimiz yerde barındırıyoruz. Bir çok ücretsiz seçenek mevcut. </p>
 <p>Bu sistemin olumlu tarafı html tabanlı sayfalar ürettiği için çok hızlı ve seo uyumlu. Ayrıca herhangi bir veritabanı ve ya dinamik dosya barındırmadığı için daha güvenli.</p>
 <p> </p>
