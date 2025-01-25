@@ -1,3 +1,3 @@
 User-agent: *
 Disallow:
-Sitemap: https://uyasar.github.io/teknozat/sitemap.xml
+Sitemap: https://teknozat.com/sitemap.xml

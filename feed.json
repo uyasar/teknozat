@@ -2,20 +2,20 @@
     "version": "https://jsonfeed.org/version/1",
     "title": "Teknozat",
     "description": "",
-    "home_page_url": "https://uyasar.github.io/teknozat",
-    "feed_url": "https://uyasar.github.io/teknozat/feed.json",
+    "home_page_url": "https://teknozat.com",
+    "feed_url": "https://teknozat.com/feed.json",
     "user_comment": "",
     "author": {
         "name": "U. Yazar"
     },
     "items": [
         {
-            "id": "https://uyasar.github.io/teknozat/merhaba/",
-            "url": "https://uyasar.github.io/teknozat/merhaba/",
+            "id": "https://teknozat.com/merhaba/",
+            "url": "https://teknozat.com/merhaba/",
             "title": "Publii İle Süper Hızlı Web Sitesi Nasıl Açılır?",
             "summary": "Publii bir statik web sitesi oluşturucu diyebileceğimiz bir içerik yönetim sistemi. Diğer içerik yönetim sistemlerinin aksine, dosyaları bir sunucuya yükleyip cms'yi oradan yönetmiyoruz. Bilgisyaraımıza kurduğumuz bir program vasıtasıyla sitemizi hazırlayıp bunu istediğimiz yerde barındırıyoruz. Bir çok ücretsiz seçenek mevcut. Bu sistemin olumlu tarafı html tabanlı&hellip;",
             "content_html": "<p>Publii bir statik web sitesi oluşturucu diyebileceğimiz bir içerik yönetim sistemi. Diğer içerik yönetim sistemlerinin aksine, dosyaları bir sunucuya yükleyip cms'yi oradan yönetmiyoruz. Bilgisyaraımıza kurduğumuz bir program vasıtasıyla sitemizi hazırlayıp bunu istediğimiz yerde barındırıyoruz. Bir çok ücretsiz seçenek mevcut. </p>\n<p>Bu sistemin olumlu tarafı html tabanlı sayfalar ürettiği için çok hızlı ve seo uyumlu. Ayrıca herhangi bir veritabanı ve ya dinamik dosya barındırmadığı için daha güvenli.</p>\n<p> </p>\n<p>Publii, kullanım kolaylığı ile statik web sitelerinin performans avantajlarını bir araya getiren yenilikçi bir statik site CMS’idir. Kodlama bilgisi veya karmaşık kurulumlar gerektiren birçok statik site üreticisinin aksine, Publii; WordPress veya Joomla! gibi sunucu tabanlı CMS platformlarına benzer sezgisel bir kullanıcı arayüzü sunar. Bu arayüz sayesinde kullanıcılar, teknik zorluklarla uğraşmadan içerik oluşturabilir, yayınlayabilir ve önceden hazırlanmış temalarla sitelerini özelleştirebilirler.</p>\n<p>Publii’yi benzersiz kılan, tamamen masaüstünüzde çalışmasıdır. Windows, Mac veya Linux fark etmeksizin, uygulamayı bilgisayarınıza kurduktan sonra internet bağlantısına ihtiyaç duymadan sitenizi oluşturabilir veya düzenleyebilirsiniz. Hazır olduğunuzda, sitenizi yayınlamak tek bir tıkla mümkündür. Publii; HTTP/HTTPS sunucuları, Netlify, Amazon S3, GitHub Pages, Google Cloud ve SFTP gibi birçok yükleme seçeneğini destekler.</p>\n<p>Kısacası, Publii; statik sitelerin hız, güvenlik ve sadeliğini, masaüstü tabanlı bir CMS’nin kullanım kolaylığı ve esnekliği ile birleştiriyor.</p>",
-            "image": "https://uyasar.github.io/teknozat/media/posts/1/publii.png",
+            "image": "https://teknozat.com/media/posts/1/publii.png",
             "author": {
                 "name": "U. Yazar"
             },
