@@ -3,7 +3,7 @@
     <title>Teknozat</title>
     <link href="https://teknozat.com/feed.xml" rel="self" />
     <link href="https://teknozat.com" />
-    <updated>2025-01-25T16:35:25+03:00</updated>
+    <updated>2025-01-25T16:38:58+03:00</updated>
     <author>
         <name>U. Yazar</name>
     </author>
@@ -42,7 +42,7 @@
 <li>Dinamik içerik oluşturulamaz</li>
 <li>Tema sayısı sınırlı</li>
 </ul>
-<h2><span style="color: #000000;"><strong>Publii İle site oluşturma</strong></span></h2>
+<h2>Publii İle site oluşturma</h2>
 <ol>
 <li>Getpublii.com üzerinden uygulamamızı indiriyoruz. Uygulama mac, windows ve linux olmak üzere tüm masaüstü işletim sistemlerinde çalışıyor.</li>
 <li>Uygulamayı açıp ilk sitemizi oluşturuyoruz.</li>
