@@ -3,12 +3,42 @@
     <title>Teknozat</title>
     <link href="https://teknozat.com/feed.xml" rel="self" />
     <link href="https://teknozat.com" />
-    <updated>2025-03-15T01:34:30+03:00</updated>
+    <updated>2025-03-15T01:42:01+03:00</updated>
     <author>
         <name>U. Yazar</name>
     </author>
     <id>https://teknozat.com</id>
 
+    <entry>
+        <title>AirPods&#x27;a Canlı Çeviri Özelliği Geliyor</title>
+        <author>
+            <name>U. Yazar</name>
+        </author>
+        <link href="https://teknozat.com/airpodsa-canli-ceviri-oezelligi-geliyor/"/>
+        <id>https://teknozat.com/airpodsa-canli-ceviri-oezelligi-geliyor/</id>
+        <media:content url="https://teknozat.com/media/posts/4/airpods.webp" medium="image" />
+            <category term="Teknoloji"/>
+
+        <updated>2025-03-15T01:42:01+03:00</updated>
+            <summary>
+                <![CDATA[
+                        <img src="https://teknozat.com/media/posts/4/airpods.webp" alt="" />
+                    Bloomberg'e göre Apple, AirPods için canlı çeviri özelliği geliştirmekte ve bu özelliğin 2025'in sonlarında iOS 19 güncellemesiyle birlikte kullanıma sunulması planlanıyor. Bu sayede kullanıcılar, manuel&hellip;
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                    <p><img src="https://teknozat.com/media/posts/4/airpods.webp" class="type:primaryImage" alt="" /></p>
+                <p data-start="47" data-end="326">Bloomberg'e göre Apple, AirPods için canlı çeviri özelliği geliştirmekte ve bu özelliğin 2025'in sonlarında iOS 19 güncellemesiyle birlikte kullanıma sunulması planlanıyor. Bu sayede kullanıcılar, manuel girişe gerek kalmadan konuşmaları gerçek zamanlı olarak çevirebilecekler.</p>
+<h3 data-start="328" data-end="364"><strong data-start="332" data-end="362">Apple AirPods Canlı Çeviri</strong></h3>
+<p data-start="365" data-end="895">Yaklaşan canlı çeviri özelliği, AirPods'un mikrofonlarını ve iPhone'un Çeviri uygulamasını kullanarak kesintisiz çok dilli iletişim sağlayacak. Kullanıcılar çeviriyi AirPods aracılığıyla duyarken, orijinal ses iPhone'un hoparlöründen çalınacak. Bu sayede, konuşmalar sırasında cihazları elden ele vermeye gerek kalmayacak. iOS 14 ile tanıtılan mevcut Çeviri uygulamasının üzerine inşa edilen bu özellik, AirPods ile daha entegre bir deneyim sunmayı amaçlıyor. Desteklenecek diller hakkında henüz kesin bilgiler açıklanmış değil.</p>
+<h3 data-start="897" data-end="929"><strong data-start="901" data-end="927">iOS 19 ile Entegrasyon</strong></h3>
+<p data-start="930" data-end="1584">AirPods'un canlı çeviri özelliği, Apple'ın yaklaşan mobil işletim sistemi güncellemesi iOS 19 ile birlikte sunulacak. Bu yazılım güncellemesi yalnızca AirPods'a çeviri özelliği eklemekle kalmayacak, aynı zamanda iPhone'lardaki Çeviri uygulamasını da geliştirecek. Çeviri uygulamasına gelecek iyileştirmelerle ilgili ayrıntılar henüz paylaşılmasa da, bu güncellemenin çeviri sürecini daha da kolaylaştırması ve AirPods ile iPhone arasındaki uyumu artırması bekleniyor. Canlı çeviri özelliğinin mevcut AirPods modellerine bir yazılım güncellemesiyle sunulması öngörülüyor. Böylece kullanıcılar yeni bir cihaz satın almadan bu yenilikten faydalanabilecek.</p>
+<h3 data-start="1586" data-end="1631"><strong data-start="1590" data-end="1629">Google ve Samsung ile Karşılaştırma</strong></h3>
+<p data-start="1632" data-end="2281" data-is-last-node="" data-is-only-node="">Apple'ın AirPods için sunduğu canlı çeviri özelliği yenilikçi olsa da, pazardaki ilk uygulama değil. Google’ın Pixel Buds modeli 2020’den beri benzer bir gerçek zamanlı çeviri özelliği sunuyor. Samsung da Galaxy Buds serisine canlı çeviri özelliğini ekledi ve bu özellik Şubat 2024'ün sonunda Galaxy S24 ve S23 kullanıcıları için kullanılabilir hale geldi. Apple'ın yaklaşımına benzer şekilde, Samsung'un çeviri sistemi de sesi ayırarak çeviri yapılan dili kulaklıklardan dinlemeye, orijinal sesi ise telefon hoparlöründen duymaya olanak tanıyor. Bu rekabet, kişisel teknolojide dil engellerini aşmanın giderek daha önemli hale geldiğini gösteriyor.</p>
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>Evren Bir Karadeliğin İçinde Olabilir mi?</title>
         <author>
