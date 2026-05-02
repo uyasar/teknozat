@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --board-light: #f0d9b5;
+    --board-dark: #b58863;
+    --board-highlight: rgba(212, 168, 83, 0.5);
+    --board-move: rgba(20, 85, 30, 0.5);
+    --board-check: rgba(220, 50, 50, 0.6);
+  }
+
+  /* Board theme: Ocean */
+  [data-board-theme="ocean"] {
+    --board-light: #dee3e6;
+    --board-dark: #8ca2ad;
+  }
+
+  /* Board theme: Dark */
+  [data-board-theme="dark"] {
+    --board-light: #aaaaaa;
+    --board-dark: #4a4a4a;
+  }
+
+  /* Board theme: Green */
+  [data-board-theme="green"] {
+    --board-light: #ffffdd;
+    --board-dark: #86a666;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface-900 text-white;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-accent/40 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent/70;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+      bg-accent text-surface-900 font-semibold text-sm
+      hover:bg-accent-light transition-all duration-200
+      focus:outline-none focus:ring-2 focus:ring-accent/50
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+      border border-white/10 text-white font-medium text-sm
+      hover:bg-white/5 transition-all duration-200
+      focus:outline-none focus:ring-2 focus:ring-white/20;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+      text-white/60 font-medium text-sm
+      hover:text-white hover:bg-white/5 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-surface-800 border border-white/5 rounded-xl p-5;
+  }
+
+  .card-hover {
+    @apply card hover:border-white/10 hover:bg-white/5 transition-all duration-200 cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10
+      text-white placeholder-white/30 text-sm
+      focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50
+      transition-all duration-200;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wide;
+  }
+
+  /* Analysis bar */
+  .eval-bar {
+    @apply w-3 rounded-full overflow-hidden border border-white/10 relative;
+    height: 300px;
+  }
+
+  .eval-bar-fill {
+    @apply absolute bottom-0 w-full bg-white transition-all duration-500;
+  }
+
+  /* Move list */
+  .move-item {
+    @apply px-2 py-1 rounded text-sm cursor-pointer transition-colors duration-150;
+  }
+
+  .move-item:hover {
+    @apply bg-white/5;
+  }
+
+  .move-item.active {
+    @apply bg-accent/20 text-accent;
+  }
+
+  /* Chessboard custom styles */
+  .chess-wrapper .cg-wrap {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-white/5 backdrop-blur-sm border border-white/10;
+  }
+
+  .divider {
+    @apply border-t border-white/5;
+  }
+}
+
+/* Kids page overrides */
+.kids-mode {
+  font-family: 'Nunito', sans-serif;
+}
+
+.kids-mode h1, .kids-mode h2 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+}
