@@ -14,11 +14,13 @@
                 </a>
             </div>
             <div class="header-actions">
-                {{#unless @member}}
-                    <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe">Subscribe</a>
-                {{/unless}}
-                {{#if @member}}
-                    <a href="{{@site.url}}/#/portal/account" class="header-account-link">My Account</a>
+                {{#if @site.members_enabled}}
+                    {{#unless @member}}
+                        <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe">Subscribe</a>
+                    {{/unless}}
+                    {{#if @member}}
+                        <a href="{{@site.url}}/#/portal/account" class="header-account-link">My Account</a>
+                    {{/if}}
                 {{/if}}
             </div>
         </div>

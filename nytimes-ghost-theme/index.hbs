@@ -2,7 +2,8 @@
 
 <div class="home-container">
 
-    {{! Featured / Lead Story Section }}
+    {{! Featured / Lead Story Section — toggled by custom setting }}
+    {{#if @custom.show_featured_section}}
     {{#get "posts" limit="5" include="authors,tags"}}
     <section class="home-lead-section">
         <div class="lead-grid">
@@ -119,6 +120,7 @@
         <span class="home-section-label">Latest News</span>
     </div>
     {{/get}}
+    {{/if}}
 
     {{! Main Posts Grid }}
     <section class="home-posts-section">
@@ -167,12 +169,14 @@
                 </div>
                 {{/get}}
 
+                {{#if @site.members_enabled}}
                 {{#unless @member}}
                 <div class="sidebar-widget sidebar-subscribe">
                     <p class="sidebar-subscribe-text">Get the latest stories delivered to your inbox.</p>
                     <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe btn-subscribe-block">Subscribe Now</a>
                 </div>
                 {{/unless}}
+                {{/if}}
             </aside>
         </div>
     </section>

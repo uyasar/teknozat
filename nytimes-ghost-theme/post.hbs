@@ -139,7 +139,7 @@
     {{/if}}
 
     {{! Related Posts }}
-    {{#get "posts" limit="3" filter="tag:[{{tags.[0].slug}}]" include="authors,tags"}}
+    {{#get "posts" limit="3" include="authors,tags"}}
     {{#if posts}}
     <section class="related-posts">
         <h2 class="related-posts-title">More From This Section</h2>

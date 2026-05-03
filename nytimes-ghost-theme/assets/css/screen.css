@@ -1633,6 +1633,22 @@ button {
    14. Ghost Card Styles (Koenig editor blocks)
    -------------------------------------------------------------------------- */
 
+/* kg-width-wide and kg-width-full are required by Ghost theme validation */
+.kg-width-wide {
+    position: relative;
+    width: 85vw;
+    max-width: 1200px;
+    margin-left: calc(50% - 42.5vw);
+    margin-right: calc(50% - 42.5vw);
+}
+
+.kg-width-full {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
 .gh-content .kg-image-card {
     margin: 2em 0;
 }

@@ -6,6 +6,10 @@
     "ghost": ">=5.0.0"
   },
   "license": "MIT",
+  "author": {
+    "name": "Ghost Theme Authors",
+    "email": "hello@example.com"
+  },
   "keywords": [
     "ghost-theme",
     "news",
@@ -36,21 +40,15 @@
     },
     "card_assets": true,
     "custom": {
-      "navigation_layout": {
-        "type": "select",
-        "options": ["Logo on left", "Logo in the middle"],
-        "default": "Logo in the middle",
-        "description": "Layout of the header navigation"
-      },
       "show_featured_section": {
         "type": "boolean",
         "default": true,
-        "description": "Show featured posts section on homepage"
+        "description": "Show the lead/featured stories section on the homepage"
       },
       "accent_color": {
         "type": "color",
         "default": "#d0021b",
-        "description": "Accent color for links and highlights"
+        "description": "Accent color used for tags, links, and highlights"
       }
     }
   }
