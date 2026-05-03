@@ -1,0 +1,156 @@
+{{!< default}}
+
+{{#post}}
+<div class="post-container">
+    <article class="post {{post_class}}">
+
+        <header class="post-header">
+            {{#if tags}}
+            <div class="post-tags">
+                {{#foreach tags limit="1"}}
+                    <a href="{{url}}" class="post-tag-link">{{name}}</a>
+                {{/foreach}}
+            </div>
+            {{/if}}
+
+            <h1 class="post-title">{{title}}</h1>
+
+            {{#if custom_excerpt}}
+            <p class="post-excerpt">{{custom_excerpt}}</p>
+            {{/if}}
+
+            <div class="post-meta">
+                <div class="post-byline">
+                    {{#foreach authors}}
+                    <div class="post-author">
+                        {{#if profile_image}}
+                        <a href="{{url}}" class="post-author-avatar-link">
+                            <img class="post-author-avatar" src="{{img_url profile_image size="xxs"}}" alt="{{name}}" width="30" height="30">
+                        </a>
+                        {{/if}}
+                        <div class="post-author-info">
+                            <span>By <a href="{{url}}" class="post-author-name">{{name}}</a></span>
+                        </div>
+                    </div>
+                    {{/foreach}}
+                </div>
+                <div class="post-meta-right">
+                    <time class="post-date" datetime="{{date format="YYYY-MM-DD"}}">
+                        {{date format="MMMM D, YYYY"}}
+                    </time>
+                    <span class="post-reading-time">{{reading_time}}</span>
+                </div>
+            </div>
+
+            <div class="post-share">
+                <span class="post-share-label">Share:</span>
+                <a href="https://twitter.com/intent/tweet?text={{encode title}}&url={{url absolute="true"}}" class="post-share-link post-share-twitter" target="_blank" rel="noopener" aria-label="Share on Twitter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{url absolute="true"}}" class="post-share-link post-share-facebook" target="_blank" rel="noopener" aria-label="Share on Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="mailto:?subject={{encode title}}&body={{url absolute="true"}}" class="post-share-link post-share-email" aria-label="Share via Email">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </a>
+            </div>
+
+            <div class="post-header-rule"></div>
+        </header>
+
+        {{#if feature_image}}
+        <figure class="post-feature-figure">
+            <img
+                class="post-feature-image"
+                srcset="{{img_url feature_image size="s"}} 300w,
+                        {{img_url feature_image size="m"}} 600w,
+                        {{img_url feature_image size="l"}} 1000w,
+                        {{img_url feature_image size="xl"}} 2000w"
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 90vw, 820px"
+                src="{{img_url feature_image size="l"}}"
+                alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+            >
+            {{#if feature_image_caption}}
+            <figcaption class="post-feature-caption">{{feature_image_caption}}</figcaption>
+            {{/if}}
+        </figure>
+        {{/if}}
+
+        <div class="post-body-wrap">
+            <section class="post-content gh-content">
+                {{content}}
+            </section>
+
+            <aside class="post-body-sidebar">
+                {{#get "tags" limit="8" order="count.posts desc"}}
+                <div class="sidebar-widget">
+                    <h3 class="sidebar-widget-title">Sections</h3>
+                    <ul class="sidebar-tag-list">
+                        {{#foreach tags}}
+                        <li class="sidebar-tag-item">
+                            <a href="{{url}}" class="sidebar-tag-link">
+                                <span class="sidebar-tag-name">{{name}}</span>
+                            </a>
+                        </li>
+                        {{/foreach}}
+                    </ul>
+                </div>
+                {{/get}}
+            </aside>
+        </div>
+
+        <footer class="post-footer">
+            {{#if tags}}
+            <div class="post-footer-tags">
+                <span class="post-footer-tags-label">Topics:</span>
+                {{#foreach tags}}
+                    <a href="{{url}}" class="post-footer-tag">{{name}}</a>
+                {{/foreach}}
+            </div>
+            {{/if}}
+
+            <div class="post-footer-authors">
+                {{#foreach authors}}
+                <div class="post-author-card">
+                    {{#if profile_image}}
+                    <a href="{{url}}" class="post-author-card-image-link">
+                        <img class="post-author-card-image" src="{{img_url profile_image size="xs"}}" alt="{{name}}" width="80" height="80">
+                    </a>
+                    {{/if}}
+                    <div class="post-author-card-info">
+                        <h4 class="post-author-card-name">
+                            <a href="{{url}}">{{name}}</a>
+                        </h4>
+                        {{#if bio}}
+                        <p class="post-author-card-bio">{{bio}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+                {{/foreach}}
+            </div>
+        </footer>
+
+    </article>
+
+    {{#if comments}}
+    <section class="post-comments">
+        {{comments}}
+    </section>
+    {{/if}}
+
+    {{! Related Posts }}
+    {{#get "posts" limit="3" filter="tag:[{{tags.[0].slug}}]" include="authors,tags"}}
+    {{#if posts}}
+    <section class="related-posts">
+        <h2 class="related-posts-title">More From This Section</h2>
+        <div class="related-posts-grid">
+            {{#foreach posts}}
+                {{> "post-card"}}
+            {{/foreach}}
+        </div>
+    </section>
+    {{/if}}
+    {{/get}}
+
+</div>
+{{/post}}

@@ -1,0 +1,65 @@
+{{!< default}}
+
+{{#tag}}
+<div class="archive-container">
+    <header class="archive-header">
+        {{#if feature_image}}
+        <div class="archive-header-image-wrap">
+            <img class="archive-header-image" src="{{img_url feature_image size="l"}}" alt="{{name}}">
+        </div>
+        {{/if}}
+        <div class="archive-header-content">
+            <h1 class="archive-title">{{name}}</h1>
+            {{#if description}}
+            <p class="archive-description">{{description}}</p>
+            {{/if}}
+            <div class="archive-meta">
+                <span class="archive-count">{{count.posts}} {{plural count.posts empty="" singular="Article" plural="Articles"}}</span>
+            </div>
+        </div>
+        <div class="archive-header-rule"></div>
+    </header>
+
+    <div class="posts-grid-layout">
+        <div class="posts-main-grid">
+            {{#foreach posts}}
+                {{> "post-card"}}
+                {{#if @last}}{{else}}<hr class="post-card-divider">{{/if}}
+            {{/foreach}}
+        </div>
+
+        <aside class="posts-sidebar">
+            {{#get "tags" limit="8" order="count.posts desc"}}
+            <div class="sidebar-widget">
+                <h3 class="sidebar-widget-title">All Sections</h3>
+                <ul class="sidebar-tag-list">
+                    {{#foreach tags}}
+                    <li class="sidebar-tag-item">
+                        <a href="{{url}}" class="sidebar-tag-link">
+                            <span class="sidebar-tag-name">{{name}}</span>
+                            <span class="sidebar-tag-count">{{count.posts}}</span>
+                        </a>
+                    </li>
+                    {{/foreach}}
+                </ul>
+            </div>
+            {{/get}}
+        </aside>
+    </div>
+
+    {{#if pagination}}
+    <nav class="pagination" aria-label="Page navigation">
+        <div class="pagination-inner">
+            {{#if pagination.prev}}
+                <a class="btn btn-pagination pagination-prev" href="{{page_url pagination.prev}}">&larr; Newer</a>
+            {{/if}}
+            <span class="pagination-info">Page {{pagination.page}} of {{pagination.pages}}</span>
+            {{#if pagination.next}}
+                <a class="btn btn-pagination pagination-next" href="{{page_url pagination.next}}">Older &rarr;</a>
+            {{/if}}
+        </div>
+    </nav>
+    {{/if}}
+
+</div>
+{{/tag}}

@@ -1,0 +1,27 @@
+{{!< default}}
+
+<div class="error-container">
+    <div class="error-inner">
+        <div class="error-content">
+            <p class="error-code">{{statusCode}}</p>
+            <div class="error-divider"></div>
+            <div class="error-text">
+                <h1 class="error-title">
+                    {{#if errorMessage}}
+                        {{errorMessage}}
+                    {{else}}
+                        Page Not Found
+                    {{/if}}
+                </h1>
+                <p class="error-description">
+                    {{#if (eq statusCode 404)}}
+                        The page you requested could not be found. It may have been moved or deleted.
+                    {{else}}
+                        An error has occurred. Please try again later.
+                    {{/if}}
+                </p>
+                <a href="{{@site.url}}" class="btn btn-error-home">Go to Homepage</a>
+            </div>
+        </div>
+    </div>
+</div>

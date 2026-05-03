@@ -1,0 +1,29 @@
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <a href="{{@site.url}}" class="footer-brand-link">
+                {{#if @site.logo}}
+                    <img src="{{@site.logo}}" alt="{{@site.title}}" class="footer-logo">
+                {{else}}
+                    <span class="footer-title">{{@site.title}}</span>
+                {{/if}}
+            </a>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <nav class="footer-nav" aria-label="Footer navigation">
+            <ul class="footer-nav-list">
+                {{navigation type="secondary"}}
+                <li class="nav-item"><a href="{{@site.url}}/rss/" class="nav-link">RSS Feeds</a></li>
+            </ul>
+        </nav>
+
+        <div class="footer-legal">
+            <p class="footer-copyright">
+                &copy; {{date format="YYYY"}} {{@site.title}}. All Rights Reserved.
+                Powered by <a href="https://ghost.org" target="_blank" rel="noopener">Ghost</a>.
+            </p>
+        </div>
+    </div>
+</footer>

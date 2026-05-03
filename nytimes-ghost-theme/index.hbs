@@ -1,0 +1,199 @@
+{{!< default}}
+
+<div class="home-container">
+
+    {{! Featured / Lead Story Section }}
+    {{#get "posts" limit="5" include="authors,tags"}}
+    <section class="home-lead-section">
+        <div class="lead-grid">
+
+            {{! Main lead story }}
+            {{#foreach posts limit="1"}}
+            <article class="lead-main {{post_class}}">
+                {{#if feature_image}}
+                <a href="{{url}}" class="lead-main-image-link">
+                    <figure class="lead-main-figure">
+                        <img
+                            class="lead-main-image"
+                            srcset="{{img_url feature_image size="m"}} 600w,
+                                    {{img_url feature_image size="l"}} 1000w,
+                                    {{img_url feature_image size="xl"}} 2000w"
+                            sizes="(max-width: 700px) 100vw, 60vw"
+                            src="{{img_url feature_image size="l"}}"
+                            alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                        >
+                        {{#if feature_image_caption}}
+                        <figcaption class="lead-main-caption">{{feature_image_caption}}</figcaption>
+                        {{/if}}
+                    </figure>
+                </a>
+                {{/if}}
+                <div class="lead-main-content">
+                    {{#if tags}}
+                    <div class="lead-main-tags">
+                        {{#foreach tags limit="1"}}
+                            <a href="{{url}}" class="lead-tag">{{name}}</a>
+                        {{/foreach}}
+                    </div>
+                    {{/if}}
+                    <h1 class="lead-main-title">
+                        <a href="{{url}}" class="lead-main-title-link">{{title}}</a>
+                    </h1>
+                    {{#if custom_excerpt}}
+                        <p class="lead-main-excerpt">{{custom_excerpt}}</p>
+                    {{else}}
+                        <p class="lead-main-excerpt">{{excerpt words="40"}}</p>
+                    {{/if}}
+                    <div class="lead-main-meta">
+                        {{#foreach authors limit="2"}}
+                            <span class="lead-author">By <a href="{{url}}" class="lead-author-link">{{name}}</a></span>{{#unless @last}}, {{/unless}}
+                        {{/foreach}}
+                    </div>
+                </div>
+            </article>
+            {{/foreach}}
+
+            {{! Secondary stories column }}
+            <div class="lead-secondary">
+                {{#foreach posts limit="3" from="2"}}
+                <article class="lead-secondary-item {{post_class}}">
+                    <div class="lead-secondary-content">
+                        {{#if tags}}
+                        <div class="post-card-tags">
+                            {{#foreach tags limit="1"}}
+                                <a href="{{url}}" class="post-card-tag">{{name}}</a>
+                            {{/foreach}}
+                        </div>
+                        {{/if}}
+                        <h2 class="lead-secondary-title">
+                            <a href="{{url}}" class="lead-secondary-title-link">{{title}}</a>
+                        </h2>
+                        {{#if custom_excerpt}}
+                            <p class="lead-secondary-excerpt">{{custom_excerpt}}</p>
+                        {{else}}
+                            <p class="lead-secondary-excerpt">{{excerpt words="20"}}</p>
+                        {{/if}}
+                        <div class="lead-secondary-meta">
+                            {{#foreach authors limit="1"}}
+                                <span class="lead-secondary-author">By <a href="{{url}}">{{name}}</a></span>
+                            {{/foreach}}
+                        </div>
+                    </div>
+                    {{#if feature_image}}
+                    <a href="{{url}}" class="lead-secondary-image-link" tabindex="-1" aria-hidden="true">
+                        <img
+                            class="lead-secondary-image"
+                            src="{{img_url feature_image size="s"}}"
+                            alt="{{title}}"
+                            loading="lazy"
+                        >
+                    </a>
+                    {{/if}}
+                </article>
+                {{#unless @last}}<hr class="lead-secondary-divider">{{/unless}}
+                {{/foreach}}
+            </div>
+
+            {{! Sidebar top stories }}
+            <aside class="lead-sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-section-title">More Top Stories</h3>
+                    {{#foreach posts limit="5" from="4"}}
+                    <article class="sidebar-story {{post_class}}">
+                        <h4 class="sidebar-story-title">
+                            <a href="{{url}}" class="sidebar-story-link">{{title}}</a>
+                        </h4>
+                        <div class="sidebar-story-meta">
+                            <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMM D"}}</time>
+                        </div>
+                    </article>
+                    {{#unless @last}}<hr class="sidebar-story-divider">{{/unless}}
+                    {{/foreach}}
+                </div>
+            </aside>
+
+        </div>
+    </section>
+
+    <div class="home-section-divider">
+        <span class="home-section-label">Latest News</span>
+    </div>
+    {{/get}}
+
+    {{! Main Posts Grid }}
+    <section class="home-posts-section">
+        <div class="posts-grid-layout">
+            <div class="posts-main-grid">
+                {{#foreach posts}}
+                    {{> "post-card"}}
+                    {{#if @last}}{{else}}<hr class="post-card-divider">{{/if}}
+                {{/foreach}}
+            </div>
+
+            <aside class="posts-sidebar">
+                {{#get "tags" limit="8" order="count.posts desc"}}
+                <div class="sidebar-widget">
+                    <h3 class="sidebar-widget-title">Sections</h3>
+                    <ul class="sidebar-tag-list">
+                        {{#foreach tags}}
+                        <li class="sidebar-tag-item">
+                            <a href="{{url}}" class="sidebar-tag-link">
+                                <span class="sidebar-tag-name">{{name}}</span>
+                                <span class="sidebar-tag-count">{{count.posts}}</span>
+                            </a>
+                        </li>
+                        {{/foreach}}
+                    </ul>
+                </div>
+                {{/get}}
+
+                {{#get "posts" limit="5" order="reading_time desc" include="authors,tags"}}
+                <div class="sidebar-widget">
+                    <h3 class="sidebar-widget-title">In Depth</h3>
+                    {{#foreach posts}}
+                    <article class="sidebar-story">
+                        {{#if tags}}
+                        <span class="sidebar-story-tag">{{#foreach tags limit="1"}}{{name}}{{/foreach}}</span>
+                        {{/if}}
+                        <h4 class="sidebar-story-title">
+                            <a href="{{url}}" class="sidebar-story-link">{{title}}</a>
+                        </h4>
+                        <div class="sidebar-story-meta">
+                            <span>{{reading_time}}</span>
+                        </div>
+                    </article>
+                    {{#unless @last}}<hr class="sidebar-story-divider">{{/unless}}
+                    {{/foreach}}
+                </div>
+                {{/get}}
+
+                {{#unless @member}}
+                <div class="sidebar-widget sidebar-subscribe">
+                    <p class="sidebar-subscribe-text">Get the latest stories delivered to your inbox.</p>
+                    <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe btn-subscribe-block">Subscribe Now</a>
+                </div>
+                {{/unless}}
+            </aside>
+        </div>
+    </section>
+
+    {{! Pagination }}
+    {{#if pagination}}
+    <nav class="pagination" aria-label="Page navigation">
+        <div class="pagination-inner">
+            {{#if pagination.prev}}
+                <a class="btn btn-pagination pagination-prev" href="{{page_url pagination.prev}}" aria-label="Previous page">
+                    &larr; Newer Stories
+                </a>
+            {{/if}}
+            <span class="pagination-info">Page {{pagination.page}} of {{pagination.pages}}</span>
+            {{#if pagination.next}}
+                <a class="btn btn-pagination pagination-next" href="{{page_url pagination.next}}" aria-label="Next page">
+                    Older Stories &rarr;
+                </a>
+            {{/if}}
+        </div>
+    </nav>
+    {{/if}}
+
+</div>
