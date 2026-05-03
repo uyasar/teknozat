@@ -1,0 +1,62 @@
+<header class="site-header">
+    <div class="header-top-bar">
+        <div class="header-top-bar-inner">
+            <div class="header-date">
+                <span class="header-date-text" id="header-date"></span>
+            </div>
+            <div class="header-brand">
+                <a href="{{@site.url}}" class="header-brand-link">
+                    {{#if @site.logo}}
+                        <img src="{{@site.logo}}" alt="{{@site.title}}" class="header-logo">
+                    {{else}}
+                        <span class="header-title">{{@site.title}}</span>
+                    {{/if}}
+                </a>
+            </div>
+            <div class="header-actions">
+                {{#unless @member}}
+                    <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe">Subscribe</a>
+                {{/unless}}
+                {{#if @member}}
+                    <a href="{{@site.url}}/#/portal/account" class="header-account-link">My Account</a>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="site-nav-inner">
+            <button class="nav-hamburger" aria-label="Toggle navigation" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <ul class="nav-list">
+                {{navigation}}
+                {{#if @site.secondary_navigation}}
+                    {{secondary_navigation}}
+                {{/if}}
+            </ul>
+            <button class="nav-search-btn" aria-label="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    {{#is "home"}}
+    <div class="header-section-rule"></div>
+    {{/is}}
+</header>
+
+<div class="nav-mobile-overlay" id="nav-overlay"></div>
+<nav class="nav-mobile" id="nav-mobile" aria-label="Mobile navigation">
+    <div class="nav-mobile-header">
+        <span class="nav-mobile-title">Sections</span>
+        <button class="nav-mobile-close" aria-label="Close navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    <ul class="nav-mobile-list">
+        {{navigation}}
+    </ul>
+</nav>
