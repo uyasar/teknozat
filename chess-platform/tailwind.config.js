@@ -6,18 +6,21 @@ export default {
     extend: {
       colors: {
         bg: {
-          base:     '#080810',
-          card:     '#101018',
-          elevated: '#16161f',
-          border:   'rgba(255,255,255,0.07)',
+          base:     '#050810',
+          card:     '#0b0f1e',
+          elevated: '#121730',
+          border:   'rgba(255,255,255,0.08)',
         },
         gold: {
-          DEFAULT: '#e9c46a',
-          light:   '#f4d78a',
-          dark:    '#c9a440',
+          DEFAULT: '#f4c430',
+          light:   '#f9d760',
+          dark:    '#c9a010',
+        },
+        accent: {
+          DEFAULT: '#6366f1',
+          light:   '#818cf8',
         },
       },
-      // Extend opacity so non-standard /3 /4 /8 /12 /35 work in @apply
       opacity: {
         2:  '0.02',
         3:  '0.03',
@@ -44,11 +47,13 @@ export default {
         'slide-up':  'slideUp .3s cubic-bezier(.16,1,.3,1)',
         'float':     'float 6s ease-in-out infinite',
         'pulse-slow':'pulse 3s ease-in-out infinite',
+        'shake':     'shake .4s ease-in-out',
       },
       keyframes: {
         fadeIn:  { from: { opacity: '0' },                              to: { opacity: '1' } },
         slideUp: { from: { opacity: '0', transform: 'translateY(8px)' },to: { opacity: '1', transform: 'translateY(0)' } },
         float:   { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
+        shake:   { '0%,100%': { transform: 'translateX(0)' }, '25%': { transform: 'translateX(-6px)' }, '75%': { transform: 'translateX(6px)' } },
       },
       minHeight: { screen: ['100vh', '100dvh'] },
     },

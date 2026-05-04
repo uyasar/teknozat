@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Zap, Brain, Trophy, BookOpen, Star, Users } from 'lucide-react'
 import { COURSES } from '../data/mockData'
 
-/* Animated board that uses chessboard.js from CDN */
 function HeroBoard() {
   const ref = useRef(null)
 
@@ -17,6 +16,7 @@ function HeroBoard() {
       'r1bq1rk1/pppp1ppp/2n2n2/1Bb1p3/4P3/3P1N2/PPP2PPP/RNBQ1RK1 w - - 0 6',
     ]
 
+    const w = Math.min(320, window.innerWidth - 64)
     const board = window.Chessboard(ref.current, {
       position:   'start',
       draggable:  false,
@@ -28,14 +28,15 @@ function HeroBoard() {
     const id = setInterval(() => {
       i = (i + 1) % POSITIONS.length
       board.position(POSITIONS[i], true)
-    }, 2200)
+    }, 2400)
 
     return () => { clearInterval(id); board.destroy() }
   }, [])
 
   return (
     <div className="relative flex items-center justify-center">
-      <div className="absolute -inset-10 bg-gold/6 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -inset-12 rounded-full pointer-events-none"
+        style={{background:'radial-gradient(circle,rgba(244,196,48,.08),transparent 70%)'}} />
       <div
         ref={ref}
         style={{ width: Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 64 : 320) }}
@@ -45,20 +46,26 @@ function HeroBoard() {
   )
 }
 
+const levelCls = {
+  'Başlangıç': 'text-emerald-400 bg-emerald-400/10',
+  'Orta':      'text-amber-400 bg-amber-400/10',
+  'İleri':     'text-red-400 bg-red-400/10',
+}
+
 function CourseCard({ course }) {
-  const lc = { 'Başlangıç': 'text-emerald-400 bg-emerald-400/10', 'Orta': 'text-amber-400 bg-amber-400/10', 'İleri': 'text-red-400 bg-red-400/10' }
   return (
     <Link to={`/dersler/${course.slug}`} className="card-hover group flex flex-col">
-      <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-white/5 to-white/2
-        border border-white/5 flex items-center justify-center text-4xl mb-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gold/3 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="aspect-[4/3] rounded-xl mb-4 flex items-center justify-center text-4xl relative overflow-hidden"
+        style={{background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.06)'}}>
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{background:'radial-gradient(circle at center,rgba(244,196,48,.08),transparent)'}} />
         ♟
       </div>
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <h3 className="font-semibold text-sm leading-snug group-hover:text-gold transition-colors">
           {course.title}
         </h3>
-        <span className={`badge shrink-0 ${lc[course.level] ?? 'text-white/40 bg-white/5'}`}>
+        <span className={`badge shrink-0 ${levelCls[course.level] ?? 'text-white/40 bg-white/5'}`}>
           {course.level}
         </span>
       </div>
@@ -77,9 +84,9 @@ function CourseCard({ course }) {
 }
 
 const FEATURES = [
-  { icon: Brain,  title: 'Stockfish AI Analizi',  desc: 'Her hamlenizi motor seviyesinde değerlendirin.' },
-  { icon: Zap,    title: 'İnteraktif Bulmacalar', desc: 'Taktik reflekslerinizi gerçek pozisyonlarla geliştirin.' },
-  { icon: Trophy, title: 'İlerleme Takibi',       desc: 'Puanlarınız ve başarı rozetlerinizi anlık izleyin.' },
+  { icon: Brain,  title: 'Stockfish 16 Analizi', desc: 'Her pozisyonu motor seviyesinde değerlendirin. Çoklu varyasyon ve derinlik analizi.' },
+  { icon: Zap,    title: 'İnteraktif Bulmacalar', desc: 'Gerçek oyunlardan alınan pozisyonlarla taktik reflekslerinizi geliştirin.' },
+  { icon: Trophy, title: 'İlerleme Takibi',       desc: 'Kurs ilerlemesi, başarı rozetleri ve öğrenme istatistiklerinizi anlık izleyin.' },
 ]
 
 export default function Home() {
@@ -87,22 +94,26 @@ export default function Home() {
     <main className="pt-16">
       {/* Hero */}
       <section className="relative overflow-hidden py-20 md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_65%_-10%,rgba(233,196,106,.07),transparent)] pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{background:'radial-gradient(ellipse 80% 50% at 65% -10%, rgba(244,196,48,.06), transparent)'}} />
         <div className="section">
           <div className="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-20">
-            {/* Text */}
             <div className="flex-1 text-center md:text-left animate-slide-up">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                bg-gold/10 border border-gold/20 text-gold text-xs font-semibold mb-5">
-                <Zap size={11} /> Stockfish 16 destekli
+                border text-xs font-bold mb-6 text-gold"
+                style={{background:'rgba(244,196,48,.08)',borderColor:'rgba(244,196,48,.2)'}}>
+                <Zap size={11} /> Stockfish 16 NNUE destekli
               </div>
               <h1 className="font-display font-bold leading-[1.05] mb-5
                 text-4xl sm:text-5xl md:text-6xl lg:text-[64px]">
                 Satranç<br />
                 <span className="text-gold-grad">Ustalaşması</span><br />
-                <span className="text-white/30 text-3xl sm:text-4xl md:text-5xl">yeniden tanımlandı</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl" style={{color:'rgba(255,255,255,.25)'}}>
+                  yeniden tanımlandı
+                </span>
               </h1>
-              <p className="text-base text-white/45 leading-relaxed mb-8 max-w-lg mx-auto md:mx-0">
+              <p className="text-base leading-relaxed mb-8 max-w-lg mx-auto md:mx-0"
+                style={{color:'rgba(255,255,255,.45)'}}>
                 Video dersler, yapay zeka analizi ve interaktif bulmacalarla
                 satranç öğrenmeyi farklı bir deneyime dönüştürün.
               </p>
@@ -115,7 +126,6 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            {/* Board */}
             <div className="shrink-0 animate-fade-in">
               <HeroBoard />
             </div>
@@ -127,13 +137,14 @@ export default function Home() {
       <section className="section py-12">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {FEATURES.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="card hover:border-gold/20 transition-colors duration-200">
-              <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20
-                flex items-center justify-center text-gold mb-4">
+            <div key={title} className="card group hover:border-gold/20 transition-colors duration-200"
+              style={{borderColor:'rgba(255,255,255,.06)'}}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-gold mb-4"
+                style={{background:'rgba(244,196,48,.1)',border:'1px solid rgba(244,196,48,.2)'}}>
                 <Icon size={18} />
               </div>
-              <h3 className="font-semibold mb-1.5">{title}</h3>
-              <p className="text-sm text-white/45 leading-relaxed">{desc}</p>
+              <h3 className="font-bold mb-1.5">{title}</h3>
+              <p className="text-sm leading-relaxed" style={{color:'rgba(255,255,255,.4)'}}>{desc}</p>
             </div>
           ))}
         </div>
@@ -144,7 +155,7 @@ export default function Home() {
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-1">Popüler Kurslar</h2>
-            <p className="text-sm text-white/35">En çok tercih edilen içerikler</p>
+            <p className="text-sm" style={{color:'rgba(255,255,255,.3)'}}>En çok tercih edilen içerikler</p>
           </div>
           <Link to="/dersler" className="btn-ghost text-sm gap-1">
             Tümü <ArrowRight size={13} />
@@ -157,12 +168,15 @@ export default function Home() {
 
       {/* CTA */}
       <section className="section py-10 pb-24">
-        <div className="rounded-2xl bg-gradient-to-br from-gold/10 via-gold/5 to-transparent
-          border border-gold/15 px-6 sm:px-12 py-12 sm:py-16 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(233,196,106,.12),transparent_70%)] pointer-events-none" />
+        <div className="rounded-2xl px-6 sm:px-12 py-12 sm:py-16 text-center relative overflow-hidden"
+          style={{background:'linear-gradient(135deg,rgba(244,196,48,.1),rgba(99,102,241,.06))',
+                  border:'1px solid rgba(244,196,48,.15)'}}>
+          <div className="absolute inset-0 pointer-events-none"
+            style={{background:'radial-gradient(circle at 50% 0%,rgba(244,196,48,.1),transparent 65%)'}} />
           <h2 className="font-display font-bold text-3xl sm:text-4xl mb-3 relative">Hemen Başlayın</h2>
-          <p className="text-white/40 mb-7 max-w-md mx-auto relative text-sm sm:text-base">
-            Ücretsiz üyelikle başlangıç kurslarına erişin. Kart bilgisi gerekmez.
+          <p className="mb-7 max-w-md mx-auto relative text-sm sm:text-base"
+            style={{color:'rgba(255,255,255,.4)'}}>
+            Ücretsiz üyelikle başlangıç kurslarına erişin. Kredi kartı gerekmez.
           </p>
           <Link to="/kayit" className="btn-primary px-8 py-3 inline-flex relative">
             Ücretsiz Üye Ol <ArrowRight size={15} />

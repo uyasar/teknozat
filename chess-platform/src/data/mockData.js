@@ -132,8 +132,9 @@ export const BOARD_THEMES = [
   { id: 'classic', name: 'Klasik',  light: '#f0d9b5', dark: '#b58863' },
   { id: 'ocean',   name: 'Okyanus', light: '#dee3e6', dark: '#8ca2ad' },
   { id: 'green',   name: 'Yeşil',   light: '#ffffdd', dark: '#86a666' },
-  { id: 'dark',    name: 'Karanlık',light: '#aaaaaa', dark: '#444444' },
+  { id: 'blue',    name: 'Mavi',    light: '#cdd5e0', dark: '#5a7fa8' },
   { id: 'purple',  name: 'Mor',     light: '#d0c5e8', dark: '#8072a3' },
+  { id: 'dark',    name: 'Koyu',    light: '#c0c0c0', dark: '#555555' },
 ]
 
 export const PIECE_THEMES = [

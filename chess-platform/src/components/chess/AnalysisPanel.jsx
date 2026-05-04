@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Cpu, Zap } from 'lucide-react'
+import { Cpu, Loader2 } from 'lucide-react'
 import clsx from 'clsx'
 import { useStockfish } from '../../hooks/useStockfish'
 
@@ -7,80 +7,106 @@ export default function AnalysisPanel({ fen, isWhiteTurn }) {
   const { ready, evaluation, lines, thinking, analyze, stop, formatScore } = useStockfish()
 
   useEffect(() => {
-    if (!ready || !fen) return
-    analyze(fen, 18)
+    if (!fen) return
+    if (ready) {
+      analyze(fen, 20)
+    }
     return () => stop()
   }, [fen, ready]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const evalStr = evaluation ? formatScore(evaluation.score, isWhiteTurn) : '…'
-  const norm = evaluation?.normalized ?? 0 // -5..+5 white perspective
-  const whitePercent = Math.round(50 + (norm / 5) * 45) // 5%..95%
+  const evalStr = evaluation ? formatScore(evaluation.score, isWhiteTurn) : '—'
+  const norm    = evaluation?.normalized ?? 0  // -5..+5 white perspective
+  const whitePct = Math.round(50 + (norm / 5) * 44)  // 6%..94%
+
+  const scoreColor = norm > 1 ? '#34d399' : norm < -1 ? '#f87171' : '#f4c430'
 
   return (
-    <div className="space-y-4">
-      {/* Score header */}
+    <div className="space-y-5">
+
+      {/* Header row */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-medium text-white/60">
-          <Cpu size={14} className="text-gold" />
-          Stockfish 16
-          {!ready && <span className="text-[10px] text-white/25 ml-1">(yükleniyor…)</span>}
+        <div className="flex items-center gap-2">
+          <Cpu size={15} className="text-gold" />
+          <span className="text-sm font-semibold text-white/70">Stockfish 16</span>
+          {!ready && (
+            <span className="flex items-center gap-1 text-[11px] text-white/30">
+              <Loader2 size={10} className="animate-spin" /> Yükleniyor…
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          {thinking && <Zap size={12} className="text-gold animate-pulse" />}
-          <span className={clsx(
-            'font-mono font-bold text-xl tabular-nums',
-            norm > 0.8 ? 'text-emerald-400' : norm < -0.8 ? 'text-red-400' : 'text-white'
-          )}>
+          {thinking && <Loader2 size={13} className="text-gold animate-spin" />}
+          <span className="font-mono font-bold text-2xl tabular-nums" style={{ color: scoreColor }}>
             {evalStr}
           </span>
         </div>
       </div>
 
       {/* Eval bar */}
-      <div className="relative h-2.5 rounded-full overflow-hidden bg-bg-elevated border border-bg-border">
+      <div className="relative h-3 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,.06)'}}>
         <div
-          className="absolute left-0 top-0 bottom-0 bg-white transition-all duration-500 rounded-full"
-          style={{ width: `${whitePercent}%` }}
+          className="absolute left-0 top-0 bottom-0 transition-all duration-700 ease-out rounded-l-full"
+          style={{ width: `${whitePct}%`, background: 'linear-gradient(90deg, #fff 60%, #e0e0e0)' }}
         />
         <div
-          className="absolute right-0 top-0 bottom-0 bg-[#333] transition-all duration-500 rounded-full"
-          style={{ width: `${100 - whitePercent}%` }}
+          className="absolute right-0 top-0 bottom-0 rounded-r-full"
+          style={{ width: `${100 - whitePct}%`, background: '#222' }}
         />
+        {/* center marker */}
+        <div className="absolute top-0 bottom-0 w-0.5 left-1/2 -translate-x-1/2"
+          style={{background:'rgba(255,255,255,.3)'}} />
       </div>
 
       {/* Lines */}
       <div className="space-y-2">
         {lines.length > 0 ? lines.filter(Boolean).map((line, i) => (
-          <div key={i} className={clsx(
-            'rounded-xl px-3.5 py-2.5 text-xs',
-            i === 0
-              ? 'bg-gold/8 border border-gold/20'
-              : 'bg-white/3 border border-bg-border'
-          )}>
+          <div
+            key={i}
+            className="rounded-xl px-4 py-3"
+            style={{
+              background: i === 0 ? 'rgba(244,196,48,.08)' : 'rgba(255,255,255,.03)',
+              border: `1px solid ${i === 0 ? 'rgba(244,196,48,.2)' : 'rgba(255,255,255,.07)'}`,
+            }}
+          >
             <div className="flex items-center justify-between mb-1">
-              <span className={clsx('font-semibold', i === 0 ? 'text-gold' : 'text-white/30')}>
-                {i === 0 ? '★ En iyi' : `${i + 1}.`}
+              <span className={clsx('text-xs font-bold', i === 0 ? 'text-gold' : 'text-white/30')}>
+                {i === 0 ? '★ En iyi hamle' : `${i + 1}. seçenek`}
               </span>
               {line.score && (
-                <span className="font-mono text-white/40">
+                <span className="font-mono text-xs text-white/40">
                   {line.score.type === 'mate'
                     ? `M${Math.abs(line.score.value)}`
                     : `${(line.score.value / 100).toFixed(1)}`}
                 </span>
               )}
             </div>
-            <p className="font-mono text-white/75 leading-relaxed tracking-wide">{line.pv}</p>
+            <p className="font-mono text-sm text-white/80 leading-relaxed tracking-wide break-all">
+              {line.pv}
+            </p>
           </div>
         )) : (
-          <div className="text-center py-6 text-white/25 text-sm">
-            {ready ? 'Pozisyon analiz ediliyor…' : 'Motor başlatılıyor…'}
+          <div className="text-center py-8 text-white/25 text-sm space-y-1">
+            {ready ? (
+              <>
+                <Loader2 size={18} className="mx-auto animate-spin opacity-40" />
+                <p>Pozisyon analiz ediliyor…</p>
+              </>
+            ) : (
+              <>
+                <Cpu size={18} className="mx-auto opacity-30" />
+                <p>Motor başlatılıyor…</p>
+                <p className="text-[11px] text-white/20">İlk yüklemede 2–3 saniye sürebilir</p>
+              </>
+            )}
           </div>
         )}
       </div>
 
-      <p className="text-[10px] text-white/20 text-center">
-        {evaluation ? `Derinlik ${evaluation.depth}` : ''}
-      </p>
+      {evaluation && (
+        <p className="text-[10px] text-white/20 text-center">
+          Derinlik {evaluation.depth} · Stockfish 16 NNUE
+        </p>
+      )}
     </div>
   )
 }
