@@ -1,43 +1,33 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { BOARD_THEMES, PIECE_THEMES } from '../data/mockData'
+import { BOARD_THEMES } from '../data/mockData'
 
 const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {
-  const [boardTheme, setBoardTheme] = useState(() =>
-    localStorage.getItem('chess_board_theme') || 'classic'
+  const [boardTheme, setBoardThemeRaw] = useState(
+    () => localStorage.getItem('chess_board') || 'classic'
   )
-  const [pieceTheme, setPieceTheme] = useState(() =>
-    localStorage.getItem('chess_piece_theme') || 'standard'
+  const [pieceTheme, setPieceThemeRaw] = useState(
+    () => localStorage.getItem('chess_pieces') || 'standard'
   )
-  const [darkMode] = useState(true)
+
+  const setBoardTheme = (id) => {
+    setBoardThemeRaw(id)
+    localStorage.setItem('chess_board', id)
+  }
+  const setPieceTheme = (id) => {
+    setPieceThemeRaw(id)
+    localStorage.setItem('chess_pieces', id)
+  }
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-board-theme', boardTheme)
-    localStorage.setItem('chess_board_theme', boardTheme)
+    document.documentElement.setAttribute('data-board', boardTheme)
   }, [boardTheme])
-
-  useEffect(() => {
-    localStorage.setItem('chess_piece_theme', pieceTheme)
-  }, [pieceTheme])
 
   const currentBoard = BOARD_THEMES.find(t => t.id === boardTheme) || BOARD_THEMES[0]
 
-  const customPieces = pieceTheme !== 'standard'
-    ? Object.fromEntries(
-        ['wK','wQ','wR','wB','wN','wP','bK','bQ','bR','bB','bN','bP'].map(p => [
-          p,
-          ({ squareWidth }) => (
-            <div
-              style={{ width: squareWidth, height: squareWidth, backgroundImage: `url(/pieces/${pieceTheme}/${p}.svg)`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
-            />
-          )
-        ])
-      )
-    : undefined
-
   return (
-    <ThemeContext.Provider value={{ boardTheme, setBoardTheme, pieceTheme, setPieceTheme, darkMode, currentBoard, customPieces }}>
+    <ThemeContext.Provider value={{ boardTheme, setBoardTheme, pieceTheme, setPieceTheme, currentBoard }}>
       {children}
     </ThemeContext.Provider>
   )

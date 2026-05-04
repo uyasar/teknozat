@@ -1,157 +1,115 @@
 import { useState, useCallback, useRef } from 'react'
 import { Chess } from 'chess.js'
 
-export function useChessGame(initialPgn = '') {
+export function useChessGame() {
   const gameRef = useRef(new Chess())
-  const [fen, setFen] = useState(gameRef.current.fen())
+  const [fen, setFen] = useState(() => gameRef.current.fen())
   const [history, setHistory] = useState([])
-  const [currentMoveIndex, setCurrentMoveIndex] = useState(-1)
-  const [gameOver, setGameOver] = useState(null)
-  const [selectedSquare, setSelectedSquare] = useState(null)
-  const [legalMoves, setLegalMoves] = useState([])
+  const [currentIndex, setCurrentIndex] = useState(-1)
   const [lastMove, setLastMove] = useState(null)
+  const [gameOver, setGameOver] = useState(null)
 
-  const syncState = useCallback((game) => {
-    setFen(game.fen())
-    const moves = game.history({ verbose: true })
-    setHistory(moves)
-    setCurrentMoveIndex(moves.length - 1)
-
-    if (game.isGameOver()) {
-      if (game.isCheckmate()) setGameOver({ reason: 'checkmate', winner: game.turn() === 'w' ? 'black' : 'white' })
-      else if (game.isDraw()) setGameOver({ reason: 'draw' })
-      else if (game.isStalemate()) setGameOver({ reason: 'stalemate' })
-    } else {
-      setGameOver(null)
-    }
+  const sync = useCallback((g, index) => {
+    const hist = g.history({ verbose: true })
+    setFen(g.fen())
+    setHistory(hist)
+    setCurrentIndex(index ?? hist.length - 1)
+    setGameOver(
+      g.isCheckmate() ? { reason: 'checkmate', winner: g.turn() === 'w' ? 'black' : 'white' }
+      : g.isDraw()      ? { reason: 'draw' }
+      : g.isStalemate() ? { reason: 'stalemate' }
+      : null
+    )
   }, [])
 
   const loadPgn = useCallback((pgn) => {
+    const g = new Chess()
     try {
-      const game = new Chess()
-      game.loadPgn(pgn)
-      gameRef.current = game
-      syncState(game)
+      g.loadPgn(pgn)
+      gameRef.current = g
+      sync(g)
       return true
     } catch {
       return false
     }
-  }, [syncState])
+  }, [sync])
 
   const loadFen = useCallback((fenStr) => {
     try {
-      const game = new Chess(fenStr)
-      gameRef.current = game
-      syncState(game)
+      const g = new Chess(fenStr)
+      gameRef.current = g
+      sync(g)
       return true
     } catch {
       return false
     }
-  }, [syncState])
+  }, [sync])
 
   const reset = useCallback(() => {
     gameRef.current = new Chess()
-    syncState(gameRef.current)
-    setSelectedSquare(null)
-    setLegalMoves([])
+    sync(gameRef.current)
     setLastMove(null)
-  }, [syncState])
+  }, [sync])
 
-  const makeMove = useCallback((move) => {
-    const game = gameRef.current
+  // Returns { move, fen } on success, null on failure
+  const makeMove = useCallback((moveObj) => {
+    const g = gameRef.current
     try {
-      const result = game.move(move)
+      const result = g.move(moveObj)
       if (result) {
         setLastMove({ from: result.from, to: result.to })
-        syncState(game)
-        return result
+        sync(g)
+        return { move: result, fen: g.fen() }
       }
-    } catch {
-      return null
-    }
+    } catch { /* invalid move */ }
     return null
-  }, [syncState])
+  }, [sync])
 
   const getLegalMovesFrom = useCallback((square) => {
-    const game = gameRef.current
-    return game.moves({ square, verbose: true }).map(m => m.to)
+    return gameRef.current.moves({ square, verbose: true }).map(m => m.to)
   }, [])
 
-  const onSquareClick = useCallback((square) => {
-    const game = gameRef.current
-
-    if (selectedSquare) {
-      const move = makeMove({ from: selectedSquare, to: square, promotion: 'q' })
-      if (move) {
-        setSelectedSquare(null)
-        setLegalMoves([])
-        return { moved: true, move }
-      }
-
-      const piece = game.get(square)
-      if (piece && piece.color === game.turn()) {
-        setSelectedSquare(square)
-        setLegalMoves(getLegalMovesFrom(square))
-        return { moved: false }
-      }
-
-      setSelectedSquare(null)
-      setLegalMoves([])
-      return { moved: false }
-    }
-
-    const piece = game.get(square)
-    if (piece && piece.color === game.turn()) {
-      setSelectedSquare(square)
-      setLegalMoves(getLegalMovesFrom(square))
-    }
-    return { moved: false }
-  }, [selectedSquare, makeMove, getLegalMovesFrom])
-
-  const goToMove = useCallback((index) => {
-    if (index < -1 || index >= history.length) return
-    const game = new Chess()
-    for (let i = 0; i <= index; i++) {
-      game.move(history[i].san)
-    }
-    setFen(game.fen())
-    setCurrentMoveIndex(index)
-    if (index >= 0) setLastMove({ from: history[index].from, to: history[index].to })
-    else setLastMove(null)
+  // Navigate to a specific move index in the history
+  const goTo = useCallback((index) => {
+    const hist = history
+    if (index < -1 || index >= hist.length) return
+    const g = new Chess()
+    for (let i = 0; i <= index; i++) g.move(hist[i].san)
+    setFen(g.fen())
+    setCurrentIndex(index)
+    setLastMove(index >= 0 ? { from: hist[index].from, to: hist[index].to } : null)
   }, [history])
 
-  const goToStart = useCallback(() => goToMove(-1), [goToMove])
-  const goToEnd = useCallback(() => goToMove(history.length - 1), [goToMove, history.length])
-  const goBack = useCallback(() => goToMove(currentMoveIndex - 1), [goToMove, currentMoveIndex])
-  const goForward = useCallback(() => goToMove(currentMoveIndex + 1), [goToMove, currentMoveIndex])
+  const goStart   = useCallback(() => goTo(-1), [goTo])
+  const goEnd     = useCallback(() => goTo(history.length - 1), [goTo, history.length])
+  const goBack    = useCallback(() => goTo(currentIndex - 1), [goTo, currentIndex])
+  const goForward = useCallback(() => goTo(currentIndex + 1), [goTo, currentIndex])
 
-  const getPgnMoves = useCallback(() => {
-    const paired = []
+  const pairedMoves = useCallback(() => {
+    const pairs = []
     for (let i = 0; i < history.length; i += 2) {
-      paired.push({ moveNumber: Math.floor(i / 2) + 1, white: history[i], black: history[i + 1] })
+      pairs.push({ n: Math.floor(i / 2) + 1, w: history[i], b: history[i + 1] })
     }
-    return paired
+    return pairs
   }, [history])
 
   return {
     game: gameRef.current,
     fen,
     history,
-    currentMoveIndex,
-    gameOver,
-    selectedSquare,
-    legalMoves,
+    currentIndex,
     lastMove,
+    gameOver,
     loadPgn,
     loadFen,
     reset,
     makeMove,
-    onSquareClick,
-    goToMove,
-    goToStart,
-    goToEnd,
+    getLegalMovesFrom,
+    goTo,
+    goStart,
+    goEnd,
     goBack,
     goForward,
-    getPgnMoves,
+    pairedMoves,
   }
 }
