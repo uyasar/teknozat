@@ -1,34 +1,36 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 
 const PIECE_CDN = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
 
 /**
  * React wrapper for chessboard.js (window.Chessboard from CDN).
- *
- * onPieceDrop(from, to) → new FEN string (valid move) | null (invalid → snapback)
+ * onPieceDrop(from, to) → new FEN string | null (snapback)
+ * onSquareClick(square) → called on square click (for piece selection)
  */
-export default function ChessBoard({
+const ChessBoard = memo(function ChessBoard({
   fen = 'start',
   onPieceDrop,
+  onSquareClick,
   orientation = 'white',
   boardWidth = 480,
   disabled = false,
-  lastMove    = null,
+  lastMove      = null,
   selectedSquare = null,
-  legalMoves  = [],
-  inCheck     = null,
+  legalMoves    = [],
+  inCheck       = null,
 }) {
   const containerRef = useRef(null)
   const boardRef     = useRef(null)
   const dropRef      = useRef(onPieceDrop)
+  const clickRef     = useRef(onSquareClick)
   const fenAfterRef  = useRef(null)
   const fenRef       = useRef(fen)
 
-  // keep callback refs fresh without re-initialising the board
-  useEffect(() => { dropRef.current = onPieceDrop }, [onPieceDrop])
-  useEffect(() => { fenRef.current  = fen          }, [fen])
+  useEffect(() => { dropRef.current  = onPieceDrop  }, [onPieceDrop])
+  useEffect(() => { clickRef.current = onSquareClick }, [onSquareClick])
+  useEffect(() => { fenRef.current   = fen           }, [fen])
 
-  // ── init board once ─────────────────────────────────────────────
+  // ── init board once ──────────────────────────────────────────
   useEffect(() => {
     if (!containerRef.current || !window.Chessboard) return
 
@@ -45,34 +47,51 @@ export default function ChessBoard({
         return undefined
       },
       onSnapEnd() {
-        // sync castling / en-passant / promotion visuals
         board.position(fenAfterRef.current ?? fenRef.current, false)
         fenAfterRef.current = null
       },
     })
 
     boardRef.current = board
-    return () => board.destroy()
+
+    // ── square click via jQuery ──────────────────────────────
+    const $ = window.$
+    if ($) {
+      $(containerRef.current).on('click.chessboard', '.square-55d63', function () {
+        if (disabled) return
+        const sq = Array.from(this.classList)
+          .find(c => /^square-[a-h][1-8]$/.test(c))
+          ?.replace('square-', '')
+        if (sq) clickRef.current?.(sq)
+      })
+    }
+
+    return () => {
+      if ($ && containerRef.current) {
+        $(containerRef.current).off('click.chessboard')
+      }
+      board.destroy()
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── sync position ───────────────────────────────────────────────
+  // ── sync position ────────────────────────────────────────────
   useEffect(() => {
     boardRef.current?.position(fen === 'start' ? 'start' : fen, true)
   }, [fen])
 
-  // ── sync orientation ────────────────────────────────────────────
+  // ── sync orientation ─────────────────────────────────────────
   useEffect(() => {
     boardRef.current?.orientation(orientation)
   }, [orientation])
 
-  // ── resize when boardWidth changes (responsive) ─────────────────
+  // ── resize ───────────────────────────────────────────────────
   useEffect(() => {
     if (!containerRef.current || !boardRef.current) return
     containerRef.current.style.width = `${boardWidth}px`
     boardRef.current.resize()
   }, [boardWidth])
 
-  // ── square highlights via jQuery ────────────────────────────────
+  // ── highlights ───────────────────────────────────────────────
   useEffect(() => {
     highlight(containerRef.current, lastMove, legalMoves, selectedSquare, inCheck)
   }, [lastMove, legalMoves, selectedSquare, inCheck])
@@ -81,10 +100,12 @@ export default function ChessBoard({
     <div
       ref={containerRef}
       style={{ width: boardWidth }}
-      className="touch-manipulation"
+      className="touch-manipulation select-none"
     />
   )
-}
+})
+
+export default ChessBoard
 
 function highlight(container, lastMove, legalMoves, selected, inCheck) {
   if (!container || !window.$) return
