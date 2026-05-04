@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import clsx from 'clsx'
 
-export default function MoveList({ moves, currentIndex, onMoveClick, compact = false }) {
+export default function MoveList({ moves, currentIndex, onMoveClick }) {
   const activeRef = useRef(null)
 
   useEffect(() => {
@@ -9,44 +9,31 @@ export default function MoveList({ moves, currentIndex, onMoveClick, compact = f
   }, [currentIndex])
 
   if (!moves.length) {
-    return (
-      <div className="text-white/30 text-sm text-center py-6">
-        Henüz hamle yapılmadı
-      </div>
-    )
+    return <p className="text-white/25 text-sm text-center py-8">Henüz hamle yapılmadı</p>
   }
 
   return (
-    <div className={clsx('font-mono text-sm overflow-y-auto', compact ? 'max-h-40' : 'max-h-72')}>
-      {moves.map(({ moveNumber, white, black }) => {
-        const whiteIdx = (moveNumber - 1) * 2
-        const blackIdx = (moveNumber - 1) * 2 + 1
-        const isWhiteActive = currentIndex === whiteIdx
-        const isBlackActive = currentIndex === blackIdx
-
+    <div className="space-y-0.5 overflow-y-auto max-h-64 pr-1">
+      {moves.map(({ n, w, b }) => {
+        const wi = (n - 1) * 2
+        const bi = (n - 1) * 2 + 1
         return (
-          <div key={moveNumber} className="flex items-center gap-1 hover:bg-white/3 rounded px-1">
-            <span className="text-white/25 w-7 text-right shrink-0">{moveNumber}.</span>
+          <div key={n} className="flex items-stretch gap-1 text-sm font-mono">
+            <span className="w-8 text-right text-white/20 py-0.5 shrink-0 text-xs leading-6">{n}.</span>
             <button
-              ref={isWhiteActive ? activeRef : null}
-              onClick={() => onMoveClick?.(whiteIdx)}
-              className={clsx(
-                'flex-1 text-left px-2 py-0.5 rounded transition-colors',
-                isWhiteActive ? 'bg-accent/20 text-accent' : 'text-white/80 hover:text-white hover:bg-white/5'
-              )}
+              ref={currentIndex === wi ? activeRef : null}
+              onClick={() => onMoveClick?.(wi)}
+              className={clsx('move-btn', currentIndex === wi && 'active')}
             >
-              {white?.san}
+              {w?.san}
             </button>
-            {black && (
+            {b && (
               <button
-                ref={isBlackActive ? activeRef : null}
-                onClick={() => onMoveClick?.(blackIdx)}
-                className={clsx(
-                  'flex-1 text-left px-2 py-0.5 rounded transition-colors',
-                  isBlackActive ? 'bg-accent/20 text-accent' : 'text-white/80 hover:text-white hover:bg-white/5'
-                )}
+                ref={currentIndex === bi ? activeRef : null}
+                onClick={() => onMoveClick?.(bi)}
+                className={clsx('move-btn', currentIndex === bi && 'active')}
               >
-                {black.san}
+                {b.san}
               </button>
             )}
           </div>

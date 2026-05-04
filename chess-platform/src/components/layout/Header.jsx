@@ -1,144 +1,156 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, X, Settings, LogOut, LayoutDashboard, Shield, ChevronDown } from 'lucide-react'
+import { Menu, X, Settings, LogOut, LayoutDashboard, Shield } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import SettingsModal from '../ui/SettingsModal'
 
 export default function Header() {
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [dropOpen,   setDropOpen]   = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const dropRef = useRef(null)
+
+  // Close dropdown on outside click or ESC
+  useEffect(() => {
+    const onMouse = (e) => { if (!dropRef.current?.contains(e.target)) setDropOpen(false) }
+    const onKey   = (e) => {
+      if (e.key === 'Escape') { setDropOpen(false); setMobileOpen(false) }
+    }
+    document.addEventListener('mousedown', onMouse)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onMouse)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [])
 
   const navLinks = [
-    { to: '/', label: 'Ana Sayfa' },
+    { to: '/',        label: 'Ana Sayfa', end: true },
     { to: '/dersler', label: 'Dersler' },
-    { to: '/cocuk', label: '♟ Çocuklar' },
+    { to: '/cocuk',   label: '♟ Çocuklar' },
   ]
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-    setUserMenuOpen(false)
-  }
+  const navCls = (active) =>
+    `block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors min-h-[44px] flex items-center
+     ${active ? 'text-gold bg-gold/8' : 'text-white/55 hover:text-white hover:bg-white/5'}`
+
+  const dropItemCls = 'flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors min-h-[48px]'
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-surface-900/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-surface-900 font-bold text-lg leading-none select-none">
+      <header className="fixed top-0 inset-x-0 z-50 bg-bg-base/85 backdrop-blur-xl border-b border-white/5">
+        <div className="section h-16 flex items-center justify-between gap-4">
+
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+            <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center
+              text-bg-base font-bold text-lg select-none group-hover:bg-gold-light transition-colors">
               ♛
             </div>
-            <span className="font-display font-bold text-lg tracking-tight">
-              Teknozat
-            </span>
+            <span className="font-display font-bold text-[15px] tracking-tight">Teknozat</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map(({ to, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive ? 'text-accent bg-accent/10' : 'text-white/60 hover:text-white hover:bg-white/5'
-                  }`
-                }
-              >
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-0.5 flex-1">
+            {navLinks.map(({ to, label, end }) => (
+              <NavLink key={to} to={to} end={end}
+                className={({ isActive }) => navCls(isActive)}>
                 {label}
               </NavLink>
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          {/* Right */}
+          <div className="flex items-center gap-1.5">
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={dropRef}>
                 <button
-                  onClick={() => setUserMenuOpen(p => !p)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                  onClick={() => setDropOpen(p => !p)}
+                  aria-expanded={dropOpen}
+                  aria-haspopup="true"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl
+                    hover:bg-white/5 transition-colors min-h-[44px]"
                 >
-                  <div className="w-7 h-7 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent text-xs font-bold">
+                  <div className="w-7 h-7 rounded-full bg-gold/15 border border-gold/25
+                    flex items-center justify-center text-gold text-xs font-bold shrink-0">
                     {user.name[0]}
                   </div>
-                  <span className="hidden sm:block text-sm text-white/80">{user.name}</span>
-                  <ChevronDown size={13} className="text-white/40" />
+                  <span className="hidden sm:block text-sm text-white/70 max-w-[120px] truncate">
+                    {user.name.split(' ')[0]}
+                  </span>
                 </button>
 
-                {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-48 rounded-xl bg-surface-800 border border-white/10 shadow-xl py-1 animate-fade-in">
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5"
-                    >
-                      <LayoutDashboard size={14} />
-                      Dashboard
+                {dropOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl
+                    bg-bg-elevated border border-white/8 shadow-2xl shadow-black/40
+                    py-1.5 animate-fade-in z-50">
+                    <Link to="/dashboard" onClick={() => setDropOpen(false)}
+                      className={`${dropItemCls} text-white/60 hover:text-white hover:bg-white/5`}>
+                      <LayoutDashboard size={15} /> Dashboard
                     </Link>
                     {isAdmin && (
-                      <Link
-                        to="/admin"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5"
-                      >
-                        <Shield size={14} />
-                        Admin Panel
+                      <Link to="/admin" onClick={() => setDropOpen(false)}
+                        className={`${dropItemCls} text-white/60 hover:text-white hover:bg-white/5`}>
+                        <Shield size={15} /> Admin Panel
                       </Link>
                     )}
                     <button
-                      onClick={() => { setSettingsOpen(true); setUserMenuOpen(false) }}
-                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5"
+                      onClick={() => { setSettingsOpen(true); setDropOpen(false) }}
+                      className={`${dropItemCls} text-white/60 hover:text-white hover:bg-white/5`}
                     >
-                      <Settings size={14} />
-                      Tahta Ayarları
+                      <Settings size={15} /> Tahta Ayarları
                     </button>
-                    <div className="divider my-1" />
+                    <div className="hr my-1.5" />
                     <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-500/5"
+                      onClick={() => { logout(); navigate('/'); setDropOpen(false) }}
+                      className={`${dropItemCls} text-red-400/70 hover:text-red-400 hover:bg-red-500/5`}
                     >
-                      <LogOut size={14} />
-                      Çıkış yap
+                      <LogOut size={15} /> Çıkış yap
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <>
-                <Link to="/giris" className="btn-ghost text-sm py-1.5">Giriş yap</Link>
-                <Link to="/kayit" className="btn-primary text-sm py-1.5">Üye ol</Link>
+                <Link to="/giris" className="btn-ghost px-4 py-2">Giriş</Link>
+                <Link to="/kayit" className="btn-primary px-4 py-2">Üye ol</Link>
               </>
             )}
 
+            {/* Hamburger */}
             <button
-              className="md:hidden btn-ghost p-2"
-              onClick={() => setMenuOpen(p => !p)}
+              className="btn-icon md:hidden"
+              onClick={() => setMobileOpen(p => !p)}
+              aria-label={mobileOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+              aria-expanded={mobileOpen}
             >
-              {menuOpen ? <X size={18} /> : <Menu size={18} />}
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
 
-        {menuOpen && (
-          <div className="md:hidden border-t border-white/5 bg-surface-900/95 px-4 py-3 space-y-1 animate-fade-in">
-            {navLinks.map(({ to, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  `block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    isActive ? 'text-accent bg-accent/10' : 'text-white/60 hover:text-white hover:bg-white/5'
-                  }`
-                }
-              >
+        {/* Mobile drawer */}
+        {mobileOpen && (
+          <nav className="md:hidden border-t border-white/5 bg-bg-base/95
+            px-4 py-3 space-y-1 animate-fade-in">
+            {navLinks.map(({ to, label, end }) => (
+              <NavLink key={to} to={to} end={end}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) => navCls(isActive)}>
                 {label}
               </NavLink>
             ))}
-          </div>
+            {!user && (
+              <div className="flex gap-2 pt-2">
+                <Link to="/giris" onClick={() => setMobileOpen(false)}
+                  className="btn-secondary flex-1 justify-center">Giriş</Link>
+                <Link to="/kayit" onClick={() => setMobileOpen(false)}
+                  className="btn-primary flex-1 justify-center">Üye ol</Link>
+              </div>
+            )}
+          </nav>
         )}
       </header>
 
