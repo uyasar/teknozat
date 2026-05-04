@@ -14,10 +14,10 @@
                     {{/if}}
                 </h1>
                 <p class="error-description">
-                    {{#if (eq statusCode 404)}}
-                        The page you requested could not be found. It may have been moved or deleted.
+                    {{#if errorMessage}}
+                        {{errorMessage}}
                     {{else}}
-                        An error has occurred. Please try again later.
+                        The page you requested could not be found. It may have been moved or deleted.
                     {{/if}}
                 </p>
                 <a href="{{@site.url}}" class="btn btn-error-home">Go to Homepage</a>

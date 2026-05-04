@@ -78,7 +78,20 @@
 
         <div class="post-body-wrap">
             <section class="post-content gh-content">
-                {{content}}
+                {{#if access}}
+                    {{content}}
+                {{else}}
+                    {{content}}
+                    {{#if @site.members_enabled}}
+                    <div class="post-paywall">
+                        <div class="post-paywall-inner">
+                            <h2 class="post-paywall-title">Subscribe to continue reading</h2>
+                            <p class="post-paywall-desc">Become a member to get access to this and all future articles.</p>
+                            <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe">Subscribe Now</a>
+                        </div>
+                    </div>
+                    {{/if}}
+                {{/if}}
             </section>
 
             <aside class="post-body-sidebar">
