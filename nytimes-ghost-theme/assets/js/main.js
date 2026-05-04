@@ -116,6 +116,16 @@
         });
     }
 
+    // Announcement bar dismiss
+    function initAnnouncementBar() {
+        var btn = document.querySelector('[data-announcement-close]');
+        var bar = document.getElementById('gh-announcement-bar');
+        if (!btn || !bar) return;
+        btn.addEventListener('click', function () {
+            bar.style.display = 'none';
+        });
+    }
+
     // Init
     document.addEventListener('DOMContentLoaded', function () {
         updateHeaderDate();
@@ -124,5 +134,6 @@
         initReadingProgress();
         initLazyImages();
         initExternalLinks();
+        initAnnouncementBar();
     });
 }());
