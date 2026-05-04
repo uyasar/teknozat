@@ -292,6 +292,7 @@ button {
 .nav-list {
     display: flex;
     align-items: center;
+    flex-wrap: nowrap;
     gap: 0;
     flex: 1;
 }
@@ -1923,8 +1924,14 @@ button {
         grid-template-columns: 1fr;
     }
 
-    .lead-secondary {
+    .lead-main,
+    .lead-secondary,
+    .lead-sidebar {
         grid-column: 1;
+        grid-row: auto;
+    }
+
+    .lead-secondary {
         border-left: none;
         border-right: none;
         border-top: var(--border);
@@ -1948,7 +1955,6 @@ button {
     }
 
     .lead-sidebar {
-        grid-column: 1;
         border-top: var(--border);
         padding-top: 16px;
     }
