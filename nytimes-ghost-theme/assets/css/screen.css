@@ -137,7 +137,56 @@ button {
 }
 
 /* --------------------------------------------------------------------------
-   3. Header
+   3. Announcement Bar (Ghost 6)
+   -------------------------------------------------------------------------- */
+
+.gh-announcement-bar {
+    position: relative;
+    z-index: 110;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 48px 10px 16px;
+    background: var(--color-black);
+    color: var(--color-white);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.gh-announcement-bar.light {
+    background: var(--color-gray-100);
+    color: var(--color-black);
+}
+
+.gh-announcement-bar a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.gh-announcement-bar-content {
+    flex: 1;
+}
+
+.gh-announcement-close {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: inherit;
+    opacity: 0.7;
+    padding: 4px;
+    transition: opacity var(--transition);
+}
+
+.gh-announcement-close:hover {
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   4. Header
    -------------------------------------------------------------------------- */
 
 .site-header {
@@ -289,15 +338,9 @@ button {
     background: currentColor;
 }
 
-.nav-search-btn {
-    color: var(--color-gray-600);
-    padding: 8px;
-    flex-shrink: 0;
-    transition: color var(--transition);
-}
-
-.nav-search-btn:hover {
-    color: var(--color-black);
+/* Ghost native search button overrides */
+.gh-search-modal-input {
+    font-family: var(--font-sans);
 }
 
 .header-section-rule {

@@ -3,7 +3,7 @@
   "description": "A Ghost theme inspired by The New York Times",
   "version": "1.0.0",
   "engines": {
-    "ghost": ">=5.0.0"
+    "ghost": ">=6.0.0"
   },
   "license": "MIT",
   "author": {
