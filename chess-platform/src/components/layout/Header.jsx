@@ -49,7 +49,7 @@ export default function Header() {
               text-bg-base font-bold text-lg select-none group-hover:bg-gold-light transition-colors">
               ♛
             </div>
-            <span className="font-display font-bold text-[15px] tracking-tight">Teknozat</span>
+            <span className="font-display font-bold text-[15px] tracking-tight">satrancdersleri</span>
           </Link>
 
           {/* Desktop nav */}

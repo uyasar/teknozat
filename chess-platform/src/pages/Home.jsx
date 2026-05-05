@@ -4,8 +4,8 @@ import { ArrowRight, Zap, Brain, Trophy, BookOpen, Star, Users } from 'lucide-re
 import { Chess } from 'chess.js'
 import { COURSES } from '../data/mockData'
 
-// Ruy Lopez moves played one by one
-const DEMO_MOVES = ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7','Re1','b5','Bb3','d6']
+// Ruy Lopez — first 3 full moves, loops
+const DEMO_MOVES = ['e4','e5','Nf3','Nc6','Bb5','a6']
 
 function HeroBoard() {
   const ref = useRef(null)
