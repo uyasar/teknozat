@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Zap, Brain, Trophy, BookOpen, Star, Users } from 'lucide-react'
+import { Chess } from 'chess.js'
 import { COURSES } from '../data/mockData'
+
+// Ruy Lopez moves played one by one
+const DEMO_MOVES = ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7','Re1','b5','Bb3','d6']
 
 function HeroBoard() {
   const ref = useRef(null)
@@ -9,26 +13,27 @@ function HeroBoard() {
   useEffect(() => {
     if (!ref.current || !window.Chessboard) return
 
-    const POSITIONS = [
-      'start',
-      'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-      'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-      'r1bq1rk1/pppp1ppp/2n2n2/1Bb1p3/4P3/3P1N2/PPP2PPP/RNBQ1RK1 w - - 0 6',
-    ]
-
-    const w = Math.min(320, window.innerWidth - 64)
     const board = window.Chessboard(ref.current, {
-      position:   'start',
-      draggable:  false,
+      position:     'start',
+      draggable:    false,
       showNotation: false,
-      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+      pieceTheme:   'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
     })
 
+    const game = new Chess()
     let i = 0
+
     const id = setInterval(() => {
-      i = (i + 1) % POSITIONS.length
-      board.position(POSITIONS[i], true)
-    }, 2400)
+      if (i >= DEMO_MOVES.length) {
+        game.reset()
+        board.position('start', false)
+        i = 0
+        return
+      }
+      try { game.move(DEMO_MOVES[i]) } catch { /**/ }
+      board.position(game.fen(), true)
+      i++
+    }, 1400)
 
     return () => { clearInterval(id); board.destroy() }
   }, [])
