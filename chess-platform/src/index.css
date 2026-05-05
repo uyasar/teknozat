@@ -140,6 +140,9 @@
 .sq-hl-to   { background-color: rgba(244,196,48,.35) !important; }
 .sq-hl-sel  { background-color: rgba(244,196,48,.4) !important; box-shadow: inset 0 0 0 3px rgba(244,196,48,.8) !important; }
 .sq-hl-check { background-color: rgba(239,68,68,.45) !important; box-shadow: inset 0 0 0 3px rgba(239,68,68,.9) !important; }
+/* Engine best-move arrow highlight (cyan) */
+.sq-hl-eng-from { background-color: rgba(34,211,238,.22) !important; }
+.sq-hl-eng-to   { background-color: rgba(34,211,238,.38) !important; box-shadow: inset 0 0 0 3px rgba(34,211,238,.75) !important; }
 .sq-hl-legal::after {
   content: '';
   display: block;

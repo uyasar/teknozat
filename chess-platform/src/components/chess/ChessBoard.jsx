@@ -18,6 +18,7 @@ const ChessBoard = memo(function ChessBoard({
   selectedSquare = null,
   legalMoves    = [],
   inCheck       = null,
+  engineMove    = null,   // { from, to } — engine best-move highlight
 }) {
   const containerRef    = useRef(null)
   const boardRef        = useRef(null)
@@ -107,8 +108,8 @@ const ChessBoard = memo(function ChessBoard({
 
   // ── highlights ───────────────────────────────────────────────
   useEffect(() => {
-    highlight(containerRef.current, lastMove, legalMoves, selectedSquare, inCheck)
-  }, [lastMove, legalMoves, selectedSquare, inCheck])
+    highlight(containerRef.current, lastMove, legalMoves, selectedSquare, inCheck, engineMove)
+  }, [lastMove, legalMoves, selectedSquare, inCheck, engineMove])
 
   return (
     <div
@@ -121,13 +122,17 @@ const ChessBoard = memo(function ChessBoard({
 
 export default ChessBoard
 
-function highlight(container, lastMove, legalMoves, selected, inCheck) {
+function highlight(container, lastMove, legalMoves, selected, inCheck, engineMove) {
   if (!container || !window.$) return
   const $b = window.$(container)
-  $b.find('.square-55d63').removeClass('sq-hl-from sq-hl-to sq-hl-sel sq-hl-legal sq-hl-check')
+  $b.find('.square-55d63').removeClass(
+    'sq-hl-from sq-hl-to sq-hl-sel sq-hl-legal sq-hl-check sq-hl-eng-from sq-hl-eng-to'
+  )
   if (lastMove?.from) $b.find(`.square-${lastMove.from}`).addClass('sq-hl-from')
   if (lastMove?.to)   $b.find(`.square-${lastMove.to  }`).addClass('sq-hl-to')
   if (selected)       $b.find(`.square-${selected      }`).addClass('sq-hl-sel')
   if (inCheck)        $b.find(`.square-${inCheck        }`).addClass('sq-hl-check')
   legalMoves?.forEach(sq => $b.find(`.square-${sq}`).addClass('sq-hl-legal'))
+  if (engineMove?.from) $b.find(`.square-${engineMove.from}`).addClass('sq-hl-eng-from')
+  if (engineMove?.to)   $b.find(`.square-${engineMove.to  }`).addClass('sq-hl-eng-to')
 }

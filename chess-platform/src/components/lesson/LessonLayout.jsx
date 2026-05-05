@@ -27,12 +27,13 @@ export default function LessonLayout({ lesson }) {
 
   const boardWidth  = useBoardWidth(480)
 
-  const [orientation,   setOrientation]  = useState('white')
-  const [aiMode,        setAiMode]       = useState('auto')
-  const [activeTab,     setActiveTab]    = useState('moves')
-  const [selectedSq,    setSelectedSq]   = useState(null)
-  const [legalMoves,    setLegalMoves]   = useState([])
-  const [deviationInfo, setDeviationInfo]= useState(null)
+  const [orientation,    setOrientation]   = useState('white')
+  const [aiMode,         setAiMode]        = useState('auto')
+  const [activeTab,      setActiveTab]     = useState('moves')
+  const [selectedSq,     setSelectedSq]    = useState(null)
+  const [legalMoves,     setLegalMoves]    = useState([])
+  const [deviationInfo,  setDeviationInfo] = useState(null)
+  const [engineBestMove, setEngineBestMove]= useState(null)
 
   // ── Puzzle state ─────────────────────────────────────────────
   const puzzles        = lesson?.puzzles ?? []
@@ -243,6 +244,7 @@ export default function LessonLayout({ lesson }) {
             selectedSquare={selectedSq}
             legalMoves={legalMoves}
             inCheck={inCheck}
+            engineMove={activeTab === 'analysis' ? engineBestMove : null}
           />
         </div>
 
@@ -296,7 +298,7 @@ export default function LessonLayout({ lesson }) {
           {TABS.filter(t => t.id !== 'puzzle' || hasPuzzles).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id)}
+              onClick={() => { setActiveTab(id); if (id !== 'analysis') setEngineBestMove(null) }}
               className={clsx(
                 'flex items-center gap-1.5 px-4 py-3 text-xs font-bold uppercase tracking-wide',
                 'transition-colors border-b-2 -mb-px',
@@ -330,7 +332,11 @@ export default function LessonLayout({ lesson }) {
           )}
           {activeTab === 'analysis' && (
             <div className="card">
-              <AnalysisPanel fen={fen} isWhiteTurn={game.turn() === 'w'} />
+              <AnalysisPanel
+                fen={fen}
+                isWhiteTurn={game.turn() === 'w'}
+                onBestMoveChange={setEngineBestMove}
+              />
             </div>
           )}
           {activeTab === 'puzzle' && (
