@@ -1,155 +1,97 @@
-import { useState, useEffect, useCallback } from 'react'
-import { CheckCircle, XCircle, Lightbulb, RotateCcw, ChevronRight } from 'lucide-react'
-import { Chess } from 'chess.js'
+import { CheckCircle2, XCircle, Lightbulb, RotateCcw, ArrowRight, Target } from 'lucide-react'
 import clsx from 'clsx'
 
-export default function PuzzlePanel({ puzzle, onSolve, onNext }) {
-  const [status, setStatus] = useState('idle') // idle | correct | wrong | solved
-  const [moveIndex, setMoveIndex] = useState(0)
-  const [hintUsed, setHintUsed] = useState(false)
-  const [attemptCount, setAttemptCount] = useState(0)
-  const [lastWrong, setLastWrong] = useState(null)
+const STATUS_CFG = {
+  idle:    { bg: 'rgba(255,255,255,.06)', border: 'rgba(255,255,255,.1)',  icon: Target,       iconCls: 'text-gold',         text: 'Tahtada en iyi hamleyi yapın.' },
+  correct: { bg: 'rgba(16,185,129,.15)', border: 'rgba(16,185,129,.4)',   icon: CheckCircle2, iconCls: 'text-emerald-400',  text: 'Doğru hamle! Devam edin.' },
+  wrong:   { bg: 'rgba(239,68,68,.15)',  border: 'rgba(239,68,68,.5)',    icon: XCircle,      iconCls: 'text-red-400',      text: 'Yanlış hamle — tekrar deneyin.' },
+  solved:  { bg: 'rgba(16,185,129,.18)', border: 'rgba(16,185,129,.5)',   icon: CheckCircle2, iconCls: 'text-emerald-300',  text: '🎉 Tebrikler! Bulmacayı çözdünüz!' },
+}
 
-  useEffect(() => {
-    setStatus('idle')
-    setMoveIndex(0)
-    setHintUsed(false)
-    setAttemptCount(0)
-    setLastWrong(null)
-  }, [puzzle?.id])
+export default function PuzzlePanel({
+  puzzle, status, moveIndex, attempts, onReset, onNext, hintUsed, onHint,
+}) {
+  if (!puzzle) return (
+    <div className="card text-center py-10 text-white/30 text-sm">
+      Bu ders için bulmaca bulunmuyor.
+    </div>
+  )
 
-  const checkMove = useCallback((from, to) => {
-    if (!puzzle || status === 'solved') return null
-
-    const game = new Chess(puzzle.fen)
-    const expectedSan = puzzle.solution[moveIndex]
-
-    let moveResult
-    try {
-      moveResult = game.move({ from, to, promotion: 'q' })
-    } catch {
-      return null
-    }
-
-    if (!moveResult) return null
-
-    const isCorrect = moveResult.san === expectedSan ||
-      (moveResult.lan && moveResult.lan === expectedSan) ||
-      `${from}${to}` === expectedSan.replace(/[^a-h1-8]/g, '')
-
-    const nextIndex = moveIndex + 1
-
-    if (isCorrect) {
-      if (nextIndex >= puzzle.solution.length) {
-        setStatus('solved')
-        onSolve?.(hintUsed, attemptCount)
-      } else {
-        setStatus('correct')
-        setMoveIndex(nextIndex)
-        setTimeout(() => setStatus('idle'), 800)
-      }
-      return moveResult
-    }
-
-    setStatus('wrong')
-    setLastWrong(moveResult.san)
-    setAttemptCount(p => p + 1)
-    setTimeout(() => setStatus('idle'), 1000)
-    return null
-  }, [puzzle, status, moveIndex, hintUsed, attemptCount, onSolve])
-
-  const reset = useCallback(() => {
-    setStatus('idle')
-    setMoveIndex(0)
-    setAttemptCount(0)
-    setLastWrong(null)
-  }, [])
-
-  if (!puzzle) return null
-
-  const difficultyStars = Array.from({ length: 5 }, (_, i) => i < (puzzle.difficulty || 1))
+  const total  = puzzle.solution?.length ?? 1
+  const stars  = puzzle.difficulty ?? 2
+  const cfg    = STATUS_CFG[status] ?? STATUS_CFG.idle
+  const Icon   = cfg.icon
 
   return (
-    <div className="card space-y-4">
+    <div className="card space-y-5">
+      {/* Header */}
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-1.5 mb-1">
-            {difficultyStars.map((filled, i) => (
-              <span key={i} className={filled ? 'text-accent' : 'text-white/15'}>★</span>
+        <div className="flex-1">
+          <div className="flex gap-0.5 mb-2">
+            {Array.from({ length: 5 }, (_, i) => (
+              <span key={i} className={clsx('text-base', i < stars ? 'text-gold' : 'text-white/15')}>★</span>
             ))}
           </div>
-          <p className="text-white/80 text-sm leading-relaxed">{puzzle.description}</p>
+          <p className="text-sm text-white/70 leading-relaxed">{puzzle.description}</p>
         </div>
-        <button
-          onClick={reset}
-          className="btn-ghost shrink-0 p-1.5"
-          title="Yeniden başla"
-        >
+        <button onClick={onReset} className="btn-icon btn-ghost shrink-0" title="Sıfırla">
           <RotateCcw size={14} />
         </button>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-white/40">
-        <span>
-          Adım {moveIndex + 1} / {puzzle.solution.length}
-        </span>
-        {attemptCount > 0 && (
-          <span className="text-red-400/70">{attemptCount} yanlış hamle</span>
-        )}
-      </div>
-
-      <div className={clsx(
-        'rounded-lg px-4 py-3 flex items-center gap-3 transition-all duration-300',
-        status === 'solved' && 'bg-emerald-500/15 border border-emerald-500/30',
-        status === 'correct' && 'bg-emerald-500/10 border border-emerald-500/20',
-        status === 'wrong' && 'bg-red-500/10 border border-red-500/20',
-        (status === 'idle') && 'bg-white/3 border border-white/5',
-      )}>
-        {status === 'solved' && <CheckCircle size={20} className="text-emerald-400 shrink-0" />}
-        {status === 'correct' && <CheckCircle size={20} className="text-emerald-400/70 shrink-0" />}
-        {status === 'wrong' && <XCircle size={20} className="text-red-400 shrink-0" />}
-        {status === 'idle' && <ChevronRight size={16} className="text-accent shrink-0" />}
-
-        <span className={clsx(
-          'text-sm',
-          status === 'solved' && 'text-emerald-300 font-semibold',
-          status === 'correct' && 'text-emerald-400',
-          status === 'wrong' && 'text-red-300',
-          status === 'idle' && 'text-white/60',
-        )}>
-          {status === 'solved' && 'Mükemmel! Bulmacayı çözdünüz.'}
-          {status === 'correct' && 'Doğru hamle! Devam edin.'}
-          {status === 'wrong' && `"${lastWrong}" yanlış. Tekrar deneyin.`}
-          {status === 'idle' && 'En iyi hamleyi bulun.'}
-        </span>
-      </div>
-
-      {!hintUsed && status !== 'solved' && (
-        <button
-          onClick={() => setHintUsed(true)}
-          className="btn-ghost w-full text-xs gap-1.5"
-        >
-          <Lightbulb size={13} />
-          İpucu göster
-        </button>
-      )}
-
-      {hintUsed && puzzle.hint && (
-        <div className="rounded-lg bg-accent/10 border border-accent/20 px-3 py-2">
-          <p className="text-accent text-xs flex items-start gap-1.5">
-            <Lightbulb size={12} className="mt-0.5 shrink-0" />
-            {puzzle.hint}
-          </p>
+      {/* Progress bar */}
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs text-white/35">
+          <span>Adım {Math.min(moveIndex + 1, total)} / {total}</span>
+          {attempts > 0 && <span className="text-red-400/70">{attempts} yanlış deneme</span>}
         </div>
+        <div className="h-2 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,.08)'}}>
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${((status === 'solved' ? total : moveIndex) / total) * 100}%`,
+              background: 'linear-gradient(90deg, #f4c430, #f9d760)',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Status banner — prominent and animated */}
+      <div
+        className={clsx(
+          'flex items-center gap-3 rounded-xl px-4 py-4 transition-all duration-200',
+          status === 'wrong' && 'animate-shake',
+          status === 'solved' && 'animate-pulse-slow',
+        )}
+        style={{ background: cfg.bg, border: `1.5px solid ${cfg.border}` }}
+      >
+        <Icon size={22} className={clsx(cfg.iconCls, 'shrink-0')} />
+        <p className={clsx('text-sm font-semibold leading-snug', cfg.iconCls)}>
+          {cfg.text}
+        </p>
+      </div>
+
+      {/* Hint */}
+      {status !== 'solved' && (
+        !hintUsed ? (
+          <button onClick={onHint} className="btn-ghost w-full text-xs gap-2">
+            <Lightbulb size={13} /> İpucu göster
+          </button>
+        ) : puzzle.hint ? (
+          <div className="rounded-xl px-4 py-3 flex items-start gap-2.5"
+            style={{background:'rgba(244,196,48,.08)',border:'1px solid rgba(244,196,48,.2)'}}>
+            <Lightbulb size={14} className="text-gold shrink-0 mt-0.5" />
+            <p className="text-gold/80 text-sm leading-relaxed">{puzzle.hint}</p>
+          </div>
+        ) : null
       )}
 
+      {/* Next puzzle button */}
       {status === 'solved' && onNext && (
         <button onClick={onNext} className="btn-primary w-full">
-          Sonraki bulmaca
-          <ChevronRight size={15} />
+          Sonraki Bulmaca <ArrowRight size={14} />
         </button>
       )}
-
     </div>
   )
 }

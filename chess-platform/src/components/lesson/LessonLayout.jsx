@@ -1,152 +1,287 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Chess } from 'chess.js'
-import { ChevronLeft, ChevronRight, SkipBack, SkipForward, FlipHorizontal, Bot, User } from 'lucide-react'
+import {
+  ChevronLeft, ChevronRight, SkipBack, SkipForward,
+  FlipHorizontal, Bot, User, BarChart2, List, Puzzle,
+} from 'lucide-react'
 import ChessBoard from '../chess/ChessBoard'
 import MoveList from '../chess/MoveList'
 import AnalysisPanel from '../chess/AnalysisPanel'
 import PuzzlePanel from '../chess/PuzzlePanel'
 import { useChessGame } from '../../hooks/useChessGame'
-import { useStockfish } from '../../hooks/useStockfish'
+import { useBoardWidth } from '../../hooks/useBoardWidth'
+import clsx from 'clsx'
+
+const TABS = [
+  { id: 'moves',    label: 'Hamleler', icon: List      },
+  { id: 'analysis', label: 'Analiz',   icon: BarChart2 },
+  { id: 'puzzle',   label: 'Bulmaca',  icon: Puzzle    },
+]
 
 export default function LessonLayout({ lesson }) {
   const {
-    fen, history, currentMoveIndex, lastMove, selectedSquare, legalMoves,
-    loadPgn, makeMove, onSquareClick, goToMove, goToStart, goToEnd, goBack, goForward,
-    getPgnMoves, game,
-  } = useChessGame(lesson?.pgn)
+    game, fen, history, currentIndex, lastMove,
+    loadPgn, makeMove, getLegalMovesFrom,
+    goTo, goStart, goEnd, goBack, goForward, pairedMoves,
+  } = useChessGame()
 
-  const { evaluate: sfEvaluate } = useStockfish()
-  const [orientation, setOrientation] = useState('white')
-  const [activeTab, setActiveTab] = useState('moves') // moves | analysis | puzzle
-  const [aiMode, setAiMode] = useState('auto') // auto | manual
-  const [deviationInfo, setDeviationInfo] = useState(null)
-  const [currentPuzzleIdx, setCurrentPuzzleIdx] = useState(0)
-  const [solvedPuzzles, setSolvedPuzzles] = useState([])
+  const boardWidth  = useBoardWidth(480)
+
+  const [orientation,   setOrientation]  = useState('white')
+  const [aiMode,        setAiMode]       = useState('auto')
+  const [activeTab,     setActiveTab]    = useState('moves')
+  const [selectedSq,    setSelectedSq]   = useState(null)
+  const [legalMoves,    setLegalMoves]   = useState([])
+  const [deviationInfo, setDeviationInfo]= useState(null)
+
+  // ── Puzzle state ─────────────────────────────────────────────
+  const puzzles        = lesson?.puzzles ?? []
+  const [puzzleIdx,    setPuzzleIdx]   = useState(0)
+  const [puzzleMvIdx,  setPuzzleMvIdx] = useState(0)
+  const [puzzleFen,    setPuzzleFen]   = useState(null)
+  const [puzzleStatus, setPuzzleStatus]= useState('idle')
+  const [attempts,     setAttempts]    = useState(0)
+  const [hintUsed,     setHintUsed]    = useState(false)
+  const [solvedIds,    setSolvedIds]   = useState([])
+
+  const currentPuzzle  = puzzles[puzzleIdx] ?? null
+  const handleDropRef  = useRef(null)
+
+  const resetPuzzle = useCallback(() => {
+    setPuzzleMvIdx(0); setPuzzleFen(null)
+    setPuzzleStatus('idle'); setAttempts(0); setHintUsed(false)
+    setSelectedSq(null); setLegalMoves([])
+  }, [])
+
+  useEffect(() => { resetPuzzle() }, [puzzleIdx, resetPuzzle])
 
   useEffect(() => {
     if (lesson?.pgn) loadPgn(lesson.pgn)
-  }, [lesson?.pgn, loadPgn])
+  }, [lesson?.pgn]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pgnGame = useCallback(() => {
-    if (!lesson?.pgn) return null
-    const g = new Chess()
-    try { g.loadPgn(lesson.pgn) } catch { return null }
-    return g
-  }, [lesson?.pgn])
+  const boardFen = activeTab === 'puzzle' && currentPuzzle
+    ? (puzzleFen ?? currentPuzzle.fen)
+    : fen
 
-  const handlePieceDrop = useCallback((from, to) => {
-    if (aiMode === 'manual') {
-      const pgnG = pgnGame()
-      if (pgnG) {
-        const pgnHistory = pgnG.history({ verbose: true })
-        const expectedMove = pgnHistory[currentMoveIndex + 1]
-        const move = makeMove({ from, to, promotion: 'q' })
-        if (!move) return false
+  const getCheckSq = useCallback((f) => {
+    try {
+      const g = new Chess(f)
+      if (!g.isCheck()) return null
+      for (const row of g.board())
+        for (const sq of row)
+          if (sq?.type === 'k' && sq?.color === g.turn()) return sq.square
+    } catch { /**/ }
+    return null
+  }, [])
 
-        if (expectedMove && (expectedMove.from !== from || expectedMove.to !== to)) {
-          setDeviationInfo({
-            explanation: `"${move.san}" hamlesi ana hatdan sapıyor. Beklenen hamle: ${expectedMove.san}. Stockfish bu konumu değerlendiriyor...`,
-            scoreLoss: null,
-          })
-          setActiveTab('analysis')
-        } else {
-          setDeviationInfo(null)
-        }
-        return true
+  // ── Drop handler ─────────────────────────────────────────────
+  const handleDrop = useCallback((from, to) => {
+    setSelectedSq(null); setLegalMoves([])
+
+    if (activeTab === 'puzzle' && currentPuzzle) {
+      const base = puzzleFen ?? currentPuzzle.fen
+      const g = new Chess(base)
+      let move
+      try { move = g.move({ from, to, promotion: 'q' }) } catch { return null }
+      if (!move) return null
+
+      const expected = currentPuzzle.solution[puzzleMvIdx]
+      const ok = move.san === expected || `${from}${to}` === expected
+
+      if (!ok) {
+        setPuzzleStatus('wrong')
+        setAttempts(a => a + 1)
+        setTimeout(() => setPuzzleStatus('idle'), 1500)
+        return null
       }
+
+      const newFen = g.fen()
+      setPuzzleFen(newFen)
+      const next = puzzleMvIdx + 1
+
+      if (next >= currentPuzzle.solution.length) {
+        setPuzzleStatus('solved')
+        setSolvedIds(p => [...new Set([...p, currentPuzzle.id])])
+        return newFen
+      }
+
+      // auto-play opponent reply
+      setTimeout(() => {
+        try {
+          const g2 = new Chess(newFen)
+          const r = g2.move(currentPuzzle.solution[next])
+          if (r) {
+            setPuzzleFen(g2.fen())
+            setPuzzleMvIdx(next + 1)
+            setPuzzleStatus('correct')
+            setTimeout(() => setPuzzleStatus('idle'), 900)
+          }
+        } catch { /**/ }
+      }, 450)
+      return newFen
     }
 
-    const result = makeMove({ from, to, promotion: 'q' })
-    return !!result
-  }, [aiMode, currentMoveIndex, makeMove, pgnGame])
+    // Lesson mode
+    if (aiMode === 'manual' && lesson?.pgn) {
+      const pgnG = new Chess()
+      try { pgnG.loadPgn(lesson.pgn) } catch { /**/ }
+      const pgn = pgnG.history({ verbose: true })
+      const exp  = pgn[currentIndex + 1]
+      const res  = makeMove({ from, to, promotion: 'q' })
+      if (!res) return null
+      if (exp && (exp.from !== from || exp.to !== to)) {
+        setDeviationInfo(`"${res.move.san}" ana hattan sapıyor. Beklenen: ${exp.san}`)
+        setActiveTab('analysis')
+      } else {
+        setDeviationInfo(null)
+      }
+      return res.fen
+    }
 
-  const handleSquareClickWrapper = useCallback((sq) => {
-    onSquareClick(sq)
-  }, [onSquareClick])
+    const res = makeMove({ from, to, promotion: 'q' })
+    return res?.fen ?? null
+  }, [activeTab, currentPuzzle, puzzleFen, puzzleMvIdx, aiMode, lesson?.pgn, currentIndex, makeMove])
 
-  const puzzles = lesson?.puzzles ?? []
-  const currentPuzzle = puzzles[currentPuzzleIdx] ?? null
+  useEffect(() => { handleDropRef.current = handleDrop }, [handleDrop])
 
-  const handlePuzzleSolve = useCallback((hintUsed) => {
-    setSolvedPuzzles(p => [...new Set([...p, currentPuzzle?.id])])
-  }, [currentPuzzle])
+  // ── Square click (piece selection + puzzle click-to-move) ────
+  const handleSquareClick = useCallback((sq) => {
+    // ── Puzzle click-to-move ─────────────────────────────────
+    if (activeTab === 'puzzle' && currentPuzzle && puzzleStatus !== 'solved') {
+      const base = puzzleFen ?? currentPuzzle.fen
+      const g = new Chess(base)
+      const piece = g.get(sq)
 
-  const handlePuzzleNext = useCallback(() => {
-    if (currentPuzzleIdx < puzzles.length - 1) setCurrentPuzzleIdx(p => p + 1)
-  }, [currentPuzzleIdx, puzzles.length])
+      if (selectedSq && selectedSq !== sq) {
+        handleDropRef.current?.(selectedSq, sq)
+        setSelectedSq(null)
+        setLegalMoves([])
+        return
+      }
+      if (piece?.color === g.turn()) {
+        setSelectedSq(sq)
+        setLegalMoves(g.moves({ square: sq, verbose: true }).map(m => m.to))
+      } else {
+        setSelectedSq(null)
+        setLegalMoves([])
+      }
+      return
+    }
+
+    if (activeTab === 'puzzle') return
+
+    const piece = game.get(sq)
+
+    if (selectedSq && selectedSq !== sq) {
+      if (piece?.color === game.turn()) {
+        setSelectedSq(sq)
+        setLegalMoves(getLegalMovesFrom(sq))
+        return
+      }
+      const res = makeMove({ from: selectedSq, to: sq, promotion: 'q' })
+      setSelectedSq(null)
+      setLegalMoves([])
+      if (res) return
+    }
+
+    if (piece?.color === game.turn()) {
+      setSelectedSq(sq)
+      setLegalMoves(getLegalMovesFrom(sq))
+    } else {
+      setSelectedSq(null)
+      setLegalMoves([])
+    }
+  }, [activeTab, game, selectedSq, getLegalMovesFrom, makeMove, currentPuzzle, puzzleStatus, puzzleFen])
+
+  const hasPuzzles = puzzles.length > 0
+  const inCheck    = getCheckSq(boardFen)
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 w-full">
-      {/* Video area */}
-      {lesson?.videoUrl && (
-        <div className="xl:hidden w-full">
-          <div className="rounded-xl overflow-hidden aspect-video bg-black">
-            <iframe
-              src={lesson.videoUrl}
-              className="w-full h-full"
-              allowFullScreen
-              title={lesson.title}
-            />
-          </div>
-        </div>
-      )}
 
-      {/* Chess board column */}
-      <div className="flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2 self-stretch justify-between">
-          <div className="flex items-center gap-1 rounded-lg bg-white/5 p-1">
-            <button
-              onClick={() => setAiMode('auto')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                aiMode === 'auto' ? 'bg-accent text-surface-900' : 'text-white/50 hover:text-white'
-              }`}
-            >
-              <Bot size={12} /> Otomatik
-            </button>
-            <button
-              onClick={() => setAiMode('manual')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                aiMode === 'manual' ? 'bg-accent text-surface-900' : 'text-white/50 hover:text-white'
-              }`}
-            >
-              <User size={12} /> Manuel
-            </button>
+      {/* ══ Board column ══════════════════════════════════════ */}
+      <div className="flex flex-col items-center gap-3 w-full xl:w-auto">
+
+        {/* Controls bar */}
+        <div className="flex items-center justify-between w-full gap-2">
+          {/* AI mode */}
+          <div className="flex items-center gap-1 rounded-xl p-1" style={{background:'rgba(255,255,255,.05)'}}>
+            {['auto', 'manual'].map(m => (
+              <button
+                key={m}
+                onClick={() => setAiMode(m)}
+                className={clsx(
+                  'flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all',
+                  aiMode === m
+                    ? 'bg-gold text-bg-base shadow-sm'
+                    : 'text-white/40 hover:text-white'
+                )}
+              >
+                {m === 'auto' ? <Bot size={12} /> : <User size={12} />}
+                <span className="hidden sm:inline">{m === 'auto' ? 'Otomatik' : 'Manuel'}</span>
+              </button>
+            ))}
           </div>
-          <button onClick={() => setOrientation(o => o === 'white' ? 'black' : 'white')} className="btn-ghost p-1.5" title="Tahtayı çevir">
-            <FlipHorizontal size={15} />
+          <button
+            onClick={() => setOrientation(o => o === 'white' ? 'black' : 'white')}
+            className="btn-icon btn-secondary"
+            aria-label="Tahtayı çevir"
+          >
+            <FlipHorizontal size={16} />
           </button>
         </div>
 
-        <ChessBoard
-          fen={fen}
-          orientation={orientation}
-          onPieceDrop={handlePieceDrop}
-          onSquareClick={handleSquareClickWrapper}
-          selectedSquare={selectedSquare}
-          legalMoves={legalMoves}
-          lastMove={lastMove}
-          boardWidth={480}
-        />
+        {/* Board */}
+        <div className="relative">
+          <ChessBoard
+            fen={boardFen}
+            onPieceDrop={handleDrop}
+            onSquareClick={handleSquareClick}
+            orientation={orientation}
+            boardWidth={boardWidth}
+            lastMove={activeTab === 'puzzle' ? null : lastMove}
+            selectedSquare={selectedSq}
+            legalMoves={legalMoves}
+            inCheck={inCheck}
+          />
+        </div>
 
-        <div className="flex items-center gap-1">
+        {/* Navigation */}
+        <div className="flex items-center gap-1.5">
           {[
-            { icon: SkipBack, action: goToStart, title: 'Başa git' },
-            { icon: ChevronLeft, action: goBack, title: 'Geri' },
-            { icon: ChevronRight, action: goForward, title: 'İleri' },
-            { icon: SkipForward, action: goToEnd, title: 'Sona git' },
-          ].map(({ icon: Icon, action, title }) => (
-            <button key={title} onClick={action} title={title} className="btn-secondary px-3 py-2">
-              <Icon size={15} />
+            { icon: SkipBack,    action: goStart,   label: 'Başa git' },
+            { icon: ChevronLeft, action: goBack,     label: 'Geri' },
+            { icon: ChevronRight,action: goForward,  label: 'İleri' },
+            { icon: SkipForward, action: goEnd,      label: 'Sona git' },
+          ].map(({ icon: Icon, action, label }) => (
+            <button
+              key={label}
+              onClick={action}
+              aria-label={label}
+              disabled={activeTab === 'puzzle'}
+              className="btn-icon btn-secondary disabled:opacity-25"
+            >
+              <Icon size={16} />
             </button>
           ))}
         </div>
+
+        {/* Deviation alert */}
+        {deviationInfo && (
+          <div className="w-full rounded-xl px-4 py-3 text-xs text-amber-200 leading-relaxed"
+            style={{background:'rgba(245,158,11,.08)',border:'1px solid rgba(245,158,11,.25)'}}>
+            <span className="font-bold text-amber-400">⚠ Sapma: </span>
+            {deviationInfo}
+          </div>
+        )}
       </div>
 
-      {/* Side panel */}
+      {/* ══ Side panel ════════════════════════════════════════ */}
       <div className="flex-1 min-w-0 space-y-4">
-        {/* Video (desktop) */}
+
+        {/* Video */}
         {lesson?.videoUrl && (
-          <div className="hidden xl:block rounded-xl overflow-hidden aspect-video bg-black">
+          <div className="rounded-2xl overflow-hidden aspect-video bg-black">
             <iframe
               src={lesson.videoUrl}
               className="w-full h-full"
@@ -157,57 +292,58 @@ export default function LessonLayout({ lesson }) {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-white/5 pb-1">
-          {[
-            { id: 'moves', label: 'Hamleler' },
-            { id: 'analysis', label: 'Analiz' },
-            ...(puzzles.length ? [{ id: 'puzzle', label: `Bulmaca (${puzzles.length})` }] : []),
-          ].map(tab => (
+        <div className="flex items-center border-b" style={{borderColor:'rgba(255,255,255,.07)'}}>
+          {TABS.filter(t => t.id !== 'puzzle' || hasPuzzles).map(({ id, label, icon: Icon }) => (
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
-                activeTab === tab.id ? 'text-accent bg-accent/10 border-b-2 border-accent' : 'text-white/40 hover:text-white'
-              }`}
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={clsx(
+                'flex items-center gap-1.5 px-4 py-3 text-xs font-bold uppercase tracking-wide',
+                'transition-colors border-b-2 -mb-px',
+                activeTab === id
+                  ? 'text-gold border-gold'
+                  : 'text-white/35 border-transparent hover:text-white/60'
+              )}
             >
-              {tab.label}
+              <Icon size={12} />
+              <span className="hidden sm:inline">{label}</span>
+              {id === 'puzzle' && (
+                <span className="ml-0.5 rounded-full px-1.5 text-[9px]"
+                  style={{background:'rgba(255,255,255,.1)'}}>
+                  {solvedIds.length}/{puzzles.length}
+                </span>
+              )}
             </button>
           ))}
         </div>
 
+        {/* Tab content */}
         <div className="animate-fade-in">
           {activeTab === 'moves' && (
             <div className="card">
               <MoveList
-                moves={getPgnMoves()}
-                currentIndex={currentMoveIndex}
-                onMoveClick={goToMove}
+                moves={pairedMoves()}
+                currentIndex={currentIndex}
+                onMoveClick={goTo}
               />
             </div>
           )}
-
           {activeTab === 'analysis' && (
-            <AnalysisPanel
-              fen={fen}
-              isWhiteTurn={game.turn() === 'w'}
-              mode={aiMode}
-              pgn={lesson?.pgn}
-              deviationInfo={deviationInfo}
-            />
-          )}
-
-          {activeTab === 'puzzle' && currentPuzzle && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-white/40 px-1">
-                <span>Bulmaca {currentPuzzleIdx + 1} / {puzzles.length}</span>
-                <span>{solvedPuzzles.length} çözüldü</span>
-              </div>
-              <PuzzlePanel
-                puzzle={currentPuzzle}
-                onSolve={handlePuzzleSolve}
-                onNext={currentPuzzleIdx < puzzles.length - 1 ? handlePuzzleNext : undefined}
-              />
+            <div className="card">
+              <AnalysisPanel fen={fen} isWhiteTurn={game.turn() === 'w'} />
             </div>
+          )}
+          {activeTab === 'puzzle' && (
+            <PuzzlePanel
+              puzzle={currentPuzzle}
+              status={puzzleStatus}
+              moveIndex={puzzleMvIdx}
+              attempts={attempts}
+              hintUsed={hintUsed}
+              onHint={() => setHintUsed(true)}
+              onReset={resetPuzzle}
+              onNext={puzzleIdx < puzzles.length - 1 ? () => setPuzzleIdx(i => i + 1) : undefined}
+            />
           )}
         </div>
       </div>

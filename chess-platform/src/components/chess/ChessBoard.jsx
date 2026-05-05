@@ -1,81 +1,133 @@
-import { useMemo } from 'react'
-import { Chessboard } from 'react-chessboard'
-import { useTheme } from '../../context/ThemeContext'
+import { memo, useEffect, useRef } from 'react'
+
+const PIECE_CDN = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
 
 /**
- * ChessBoard wraps react-chessboard (chessboardjs-compatible API)
- * with theme support, move highlighting and arrow annotations.
+ * React wrapper for chessboard.js (window.Chessboard from CDN).
+ * onPieceDrop(from, to) → new FEN string | null (snapback)
+ * onSquareClick(square) → called on square click (for piece selection)
  */
-export default function ChessBoard({
-  fen,
+const ChessBoard = memo(function ChessBoard({
+  fen = 'start',
   onPieceDrop,
   onSquareClick,
   orientation = 'white',
-  selectedSquare,
-  legalMoves = [],
-  lastMove,
-  arrows = [],
-  disabled = false,
   boardWidth = 480,
-  showCoords = true,
+  disabled = false,
+  lastMove      = null,
+  selectedSquare = null,
+  legalMoves    = [],
+  inCheck       = null,
 }) {
-  const { currentBoard, customPieces } = useTheme()
+  const containerRef    = useRef(null)
+  const boardRef        = useRef(null)
+  const dropRef         = useRef(onPieceDrop)
+  const clickRef        = useRef(onSquareClick)
+  const fenAfterRef     = useRef(null)
+  const fenRef          = useRef(fen)
+  const onDropClickRef  = useRef(null) // tracks which square onDrop already fired click for
 
-  const customSquareStyles = useMemo(() => {
-    const styles = {}
+  useEffect(() => { dropRef.current  = onPieceDrop  }, [onPieceDrop])
+  useEffect(() => { clickRef.current = onSquareClick }, [onSquareClick])
+  useEffect(() => { fenRef.current   = fen           }, [fen])
 
-    if (lastMove) {
-      styles[lastMove.from] = { backgroundColor: 'rgba(212, 168, 83, 0.35)' }
-      styles[lastMove.to] = { backgroundColor: 'rgba(212, 168, 83, 0.5)' }
-    }
+  // ── init board once ──────────────────────────────────────────
+  useEffect(() => {
+    if (!containerRef.current || !window.Chessboard) return
 
-    if (selectedSquare) {
-      styles[selectedSquare] = { backgroundColor: 'rgba(212, 168, 83, 0.6)' }
-    }
-
-    legalMoves.forEach(sq => {
-      styles[sq] = {
-        background: 'radial-gradient(circle, rgba(212,168,83,0.5) 30%, transparent 30%)',
-        borderRadius: '50%',
-      }
+    const board = window.Chessboard(containerRef.current, {
+      draggable:  !disabled,
+      position:   fen === 'start' ? 'start' : fen,
+      orientation,
+      pieceTheme: PIECE_CDN,
+      onDrop(source, target) {
+        if (disabled) return 'snapback'
+        if (source === target) {
+          // piece was clicked (not dragged) — fire click handler here;
+          // the jQuery click event also fires afterward, use the ref to suppress it
+          onDropClickRef.current = source
+          clickRef.current?.(source)
+          return 'snapback'
+        }
+        const newFen = dropRef.current?.(source, target)
+        if (!newFen) return 'snapback'
+        fenAfterRef.current = newFen
+        return undefined
+      },
+      onSnapEnd() {
+        board.position(fenAfterRef.current ?? fenRef.current, false)
+        fenAfterRef.current = null
+      },
     })
 
-    return styles
-  }, [lastMove, selectedSquare, legalMoves])
+    boardRef.current = board
 
-  const handlePieceDrop = (sourceSquare, targetSquare, piece) => {
-    if (disabled) return false
-    return onPieceDrop?.(sourceSquare, targetSquare, piece) ?? false
-  }
+    // ── square click via jQuery ──────────────────────────────
+    const $ = window.$
+    if ($) {
+      $(containerRef.current).on('click.chessboard', '.square-55d63', function () {
+        if (disabled) return
+        const sq = Array.from(this.classList)
+          .find(c => /^square-[a-h][1-8]$/.test(c))
+          ?.replace('square-', '')
+        if (!sq) return
+        // onDrop(source, source) already fired click for piece-clicks; skip duplicate
+        if (onDropClickRef.current === sq) {
+          onDropClickRef.current = null
+          return
+        }
+        clickRef.current?.(sq)
+      })
+    }
 
-  const handleSquareClick = (square) => {
-    if (disabled) return
-    onSquareClick?.(square)
-  }
+    return () => {
+      if ($ && containerRef.current) {
+        $(containerRef.current).off('click.chessboard')
+      }
+      board.destroy()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── sync position ────────────────────────────────────────────
+  useEffect(() => {
+    boardRef.current?.position(fen === 'start' ? 'start' : fen, true)
+  }, [fen])
+
+  // ── sync orientation ─────────────────────────────────────────
+  useEffect(() => {
+    boardRef.current?.orientation(orientation)
+  }, [orientation])
+
+  // ── resize ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!containerRef.current || !boardRef.current) return
+    containerRef.current.style.width = `${boardWidth}px`
+    boardRef.current.resize()
+  }, [boardWidth])
+
+  // ── highlights ───────────────────────────────────────────────
+  useEffect(() => {
+    highlight(containerRef.current, lastMove, legalMoves, selectedSquare, inCheck)
+  }, [lastMove, legalMoves, selectedSquare, inCheck])
 
   return (
-    <div className="chess-wrapper rounded-lg overflow-hidden shadow-2xl" style={{ width: boardWidth }}>
-      <Chessboard
-        id="main-board"
-        position={fen}
-        onPieceDrop={handlePieceDrop}
-        onSquareClick={handleSquareClick}
-        boardOrientation={orientation}
-        customBoardStyle={{
-          borderRadius: '6px',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-        }}
-        customLightSquareStyle={{ backgroundColor: currentBoard.light }}
-        customDarkSquareStyle={{ backgroundColor: currentBoard.dark }}
-        customSquareStyles={customSquareStyles}
-        customPieces={customPieces}
-        customArrows={arrows}
-        showBoardNotation={showCoords}
-        areArrowsAllowed={false}
-        isDraggablePiece={() => !disabled}
-        boardWidth={boardWidth}
-        animationDuration={200}
-      />
-    </div>
+    <div
+      ref={containerRef}
+      style={{ width: boardWidth }}
+      className="touch-manipulation select-none"
+    />
   )
+})
+
+export default ChessBoard
+
+function highlight(container, lastMove, legalMoves, selected, inCheck) {
+  if (!container || !window.$) return
+  const $b = window.$(container)
+  $b.find('.square-55d63').removeClass('sq-hl-from sq-hl-to sq-hl-sel sq-hl-legal sq-hl-check')
+  if (lastMove?.from) $b.find(`.square-${lastMove.from}`).addClass('sq-hl-from')
+  if (lastMove?.to)   $b.find(`.square-${lastMove.to  }`).addClass('sq-hl-to')
+  if (selected)       $b.find(`.square-${selected      }`).addClass('sq-hl-sel')
+  if (inCheck)        $b.find(`.square-${inCheck        }`).addClass('sq-hl-check')
+  legalMoves?.forEach(sq => $b.find(`.square-${sq}`).addClass('sq-hl-legal'))
 }

@@ -1,105 +1,110 @@
-import { useEffect, useState } from 'react'
-import { Brain, Zap, ChevronRight } from 'lucide-react'
+import { useEffect } from 'react'
+import { Cpu, Loader2 } from 'lucide-react'
 import clsx from 'clsx'
 import { useStockfish } from '../../hooks/useStockfish'
 
-function EvalBar({ normalized }) {
-  const clampedScore = Math.max(-5, Math.min(5, normalized ?? 0))
-  const whitePercent = 50 + (clampedScore / 5) * 50
-
-  return (
-    <div className="flex flex-col items-center gap-1 w-6">
-      <span className="text-[10px] text-white/40">B</span>
-      <div className="w-5 rounded-full overflow-hidden border border-white/10 flex flex-col" style={{ height: 200 }}>
-        <div className="w-full bg-black/80 transition-all duration-500" style={{ height: `${100 - whitePercent}%` }} />
-        <div className="w-full bg-white flex-1" />
-      </div>
-      <span className="text-[10px] text-white/40">S</span>
-    </div>
-  )
-}
-
-export default function AnalysisPanel({ fen, isWhiteTurn, mode = 'auto', pgn = '', deviationInfo = null }) {
-  const { ready, evaluation, thinking, lines, analyze, stop, getEvalText } = useStockfish()
-  const [autoRunning, setAutoRunning] = useState(false)
+export default function AnalysisPanel({ fen, isWhiteTurn }) {
+  const { ready, evaluation, lines, thinking, analyze, stop, formatScore } = useStockfish()
 
   useEffect(() => {
-    if (!ready || !fen) return
-    analyze(fen, 15)
-  }, [fen, ready, analyze])
-
-  useEffect(() => {
+    if (!fen) return
+    if (ready) {
+      analyze(fen, 20)
+    }
     return () => stop()
-  }, [stop])
+  }, [fen, ready]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const evalLabel = evaluation ? getEvalText(evaluation.score, isWhiteTurn) : '...'
-  const evalNum = evaluation?.normalized ?? 0
+  const evalStr = evaluation ? formatScore(evaluation.score, isWhiteTurn) : '—'
+  const norm    = evaluation?.normalized ?? 0  // -5..+5 white perspective
+  const whitePct = Math.round(50 + (norm / 5) * 44)  // 6%..94%
+
+  const scoreColor = norm > 1 ? '#34d399' : norm < -1 ? '#f87171' : '#f4c430'
 
   return (
-    <div className="card space-y-4">
+    <div className="space-y-5">
+
+      {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Brain size={16} className="text-accent" />
-          <span className="font-semibold text-sm">Stockfish Analizi</span>
-          {!ready && <span className="text-[10px] text-white/30 ml-1">(yükleniyor)</span>}
+          <Cpu size={15} className="text-gold" />
+          <span className="text-sm font-semibold text-white/70">Stockfish 16</span>
+          {!ready && (
+            <span className="flex items-center gap-1 text-[11px] text-white/30">
+              <Loader2 size={10} className="animate-spin" /> Yükleniyor…
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-1.5">
-          {thinking && <Zap size={12} className="text-accent animate-pulse" />}
-          <span className={clsx(
-            'text-lg font-mono font-bold',
-            evalNum > 0.5 ? 'text-emerald-400' : evalNum < -0.5 ? 'text-red-400' : 'text-white'
-          )}>
-            {evalLabel}
+        <div className="flex items-center gap-2">
+          {thinking && <Loader2 size={13} className="text-gold animate-spin" />}
+          <span className="font-mono font-bold text-2xl tabular-nums" style={{ color: scoreColor }}>
+            {evalStr}
           </span>
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <EvalBar normalized={evalNum} />
-        <div className="flex-1 space-y-1.5">
-          {lines.length > 0 ? lines.map((line, i) => (
-            <div key={i} className={clsx(
-              'rounded-lg px-3 py-2 text-xs',
-              i === 0 ? 'bg-accent/10 border border-accent/20' : 'bg-white/3'
-            )}>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className={clsx('font-semibold', i === 0 ? 'text-accent' : 'text-white/50')}>
-                  {i === 0 ? '★' : `${i + 1}.`}
-                </span>
-                {line.score && (
-                  <span className="text-white/40 text-[10px]">
-                    {line.score.type === 'mate' ? `M${Math.abs(line.score.value)}` : `${(line.score.value / 100).toFixed(1)}`}
-                  </span>
-                )}
-              </div>
-              <p className="font-mono text-white/80 leading-relaxed">{line.pv || '...'}</p>
-            </div>
-          )) : (
-            <div className="text-white/30 text-sm py-4 text-center">
-              {ready ? 'Analiz bekleniyor...' : 'Motor başlatılıyor...'}
-            </div>
-          )}
-        </div>
+      {/* Eval bar */}
+      <div className="relative h-3 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,.06)'}}>
+        <div
+          className="absolute left-0 top-0 bottom-0 transition-all duration-700 ease-out rounded-l-full"
+          style={{ width: `${whitePct}%`, background: 'linear-gradient(90deg, #fff 60%, #e0e0e0)' }}
+        />
+        <div
+          className="absolute right-0 top-0 bottom-0 rounded-r-full"
+          style={{ width: `${100 - whitePct}%`, background: '#222' }}
+        />
+        {/* center marker */}
+        <div className="absolute top-0 bottom-0 w-0.5 left-1/2 -translate-x-1/2"
+          style={{background:'rgba(255,255,255,.3)'}} />
       </div>
 
-      {deviationInfo && (
-        <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-3 space-y-1">
-          <div className="flex items-center gap-1.5 text-red-400 font-semibold text-xs">
-            <ChevronRight size={12} />
-            PGN Dışına Çıkıldı
-          </div>
-          <p className="text-white/70 text-xs leading-relaxed">{deviationInfo.explanation}</p>
-          {deviationInfo.scoreLoss && (
-            <p className="text-red-400 text-xs font-mono">
-              Skor farkı: {deviationInfo.scoreLoss > 0 ? '-' : '+'}{Math.abs(deviationInfo.scoreLoss).toFixed(2)} puan
+      {/* Lines */}
+      <div className="space-y-2">
+        {lines.length > 0 ? lines.filter(Boolean).map((line, i) => (
+          <div
+            key={i}
+            className="rounded-xl px-4 py-3"
+            style={{
+              background: i === 0 ? 'rgba(244,196,48,.08)' : 'rgba(255,255,255,.03)',
+              border: `1px solid ${i === 0 ? 'rgba(244,196,48,.2)' : 'rgba(255,255,255,.07)'}`,
+            }}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className={clsx('text-xs font-bold', i === 0 ? 'text-gold' : 'text-white/30')}>
+                {i === 0 ? '★ En iyi hamle' : `${i + 1}. seçenek`}
+              </span>
+              {line.score && (
+                <span className="font-mono text-xs text-white/40">
+                  {line.score.type === 'mate'
+                    ? `M${Math.abs(line.score.value)}`
+                    : `${(line.score.value / 100).toFixed(1)}`}
+                </span>
+              )}
+            </div>
+            <p className="font-mono text-sm text-white/80 leading-relaxed tracking-wide break-all">
+              {line.pv}
             </p>
-          )}
-        </div>
-      )}
+          </div>
+        )) : (
+          <div className="text-center py-8 text-white/25 text-sm space-y-1">
+            {ready ? (
+              <>
+                <Loader2 size={18} className="mx-auto animate-spin opacity-40" />
+                <p>Pozisyon analiz ediliyor…</p>
+              </>
+            ) : (
+              <>
+                <Cpu size={18} className="mx-auto opacity-30" />
+                <p>Motor başlatılıyor…</p>
+                <p className="text-[11px] text-white/20">İlk yüklemede 2–3 saniye sürebilir</p>
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
-      {mode === 'manual' && (
-        <p className="text-white/30 text-xs">
-          Manuel modda: PGN'den sapma anında açıklama gösterilir.
+      {evaluation && (
+        <p className="text-[10px] text-white/20 text-center">
+          Derinlik {evaluation.depth} · Stockfish 16 NNUE
         </p>
       )}
     </div>

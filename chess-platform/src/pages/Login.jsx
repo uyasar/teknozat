@@ -23,7 +23,7 @@ export default function Login({ isRegister = false }) {
     <main className="pt-16 min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm animate-slide-up">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center text-surface-900 text-3xl mx-auto mb-4">♛</div>
+          <div className="w-14 h-14 rounded-2xl bg-gold flex items-center justify-center text-bg-base text-3xl mx-auto mb-4">♛</div>
           <h1 className="font-display font-bold text-2xl mb-1">
             {isRegister ? 'Üye Ol' : 'Giriş Yap'}
           </h1>
@@ -78,9 +78,9 @@ export default function Login({ isRegister = false }) {
 
         <div className="text-center mt-5 text-sm text-white/40">
           {isRegister ? (
-            <>Zaten hesabınız var mı? <Link to="/giris" className="text-accent hover:underline">Giriş yap</Link></>
+            <>Zaten hesabınız var mı? <Link to="/giris" className="text-gold hover:underline">Giriş yap</Link></>
           ) : (
-            <>Hesabınız yok mu? <Link to="/kayit" className="text-accent hover:underline">Üye ol</Link></>
+            <>Hesabınız yok mu? <Link to="/kayit" className="text-gold hover:underline">Üye ol</Link></>
           )}
         </div>
 

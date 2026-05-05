@@ -2,157 +2,177 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── CSS custom properties ──────────────────────────────────── */
 @layer base {
   :root {
     --board-light: #f0d9b5;
-    --board-dark: #b58863;
-    --board-highlight: rgba(212, 168, 83, 0.5);
-    --board-move: rgba(20, 85, 30, 0.5);
-    --board-check: rgba(220, 50, 50, 0.6);
+    --board-dark:  #b58863;
+    --hl:   rgba(244,196,48,.6);
+    --legal: rgba(0,0,0,.2);
   }
-
-  /* Board theme: Ocean */
-  [data-board-theme="ocean"] {
-    --board-light: #dee3e6;
-    --board-dark: #8ca2ad;
-  }
-
-  /* Board theme: Dark */
-  [data-board-theme="dark"] {
-    --board-light: #aaaaaa;
-    --board-dark: #4a4a4a;
-  }
-
-  /* Board theme: Green */
-  [data-board-theme="green"] {
-    --board-light: #ffffdd;
-    --board-dark: #86a666;
-  }
+  [data-board="ocean"]  { --board-light:#dee3e6; --board-dark:#8ca2ad; }
+  [data-board="green"]  { --board-light:#ffffdd; --board-dark:#86a666; }
+  [data-board="dark"]   { --board-light:#c0c0c0; --board-dark:#555555; }
+  [data-board="purple"] { --board-light:#d0c5e8; --board-dark:#8072a3; }
+  [data-board="blue"]   { --board-light:#cdd5e0; --board-dark:#5a7fa8; }
 
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-gutter: stable;
   }
+  body { @apply bg-bg-base text-white antialiased; }
 
-  body {
-    @apply bg-surface-900 text-white;
-  }
-
-  * {
-    @apply box-border;
-  }
-
-  ::-webkit-scrollbar {
-    @apply w-1.5;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-surface-800;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-accent/40 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-accent/70;
-  }
+  ::-webkit-scrollbar       { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
 }
 
+/* ─── Components ──────────────────────────────────────────────── */
 @layer components {
+
+  /* ── Buttons ── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-sm
+           rounded-xl transition-all duration-150 select-none
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40
+           disabled:opacity-40 disabled:pointer-events-none;
+    min-height: 44px;
+    min-width: 44px;
+  }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
-      bg-accent text-surface-900 font-semibold text-sm
-      hover:bg-accent-light transition-all duration-200
-      focus:outline-none focus:ring-2 focus:ring-accent/50
-      disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply btn px-5 text-bg-base font-bold active:scale-95;
+    background: linear-gradient(135deg, #f4c430, #f9d760);
+    box-shadow: 0 2px 12px rgba(244,196,48,.25);
   }
-
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #f9d760, #f4c430);
+    box-shadow: 0 4px 20px rgba(244,196,48,.35);
+  }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
-      border border-white/10 text-white font-medium text-sm
-      hover:bg-white/5 transition-all duration-200
-      focus:outline-none focus:ring-2 focus:ring-white/20;
+    @apply btn px-5 border border-white/12 text-white/70
+           hover:text-white hover:border-white/20 active:scale-95;
+    background: rgba(255,255,255,.04);
   }
-
+  .btn-secondary:hover { background: rgba(255,255,255,.07); }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
-      text-white/60 font-medium text-sm
-      hover:text-white hover:bg-white/5 transition-all duration-200;
+    @apply btn px-3 text-white/50 hover:text-white active:scale-95;
   }
+  .btn-ghost:hover { background: rgba(255,255,255,.06); }
+  .btn-icon { @apply btn w-11 h-11 p-0; }
 
+  /* ── Cards ── */
   .card {
-    @apply bg-surface-800 border border-white/5 rounded-xl p-5;
+    @apply rounded-2xl p-5;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.07);
   }
-
+  .card-sm {
+    @apply rounded-xl p-4;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.07);
+  }
   .card-hover {
-    @apply card hover:border-white/10 hover:bg-white/5 transition-all duration-200 cursor-pointer;
+    @apply card cursor-pointer transition-all duration-200;
+  }
+  .card-hover:hover {
+    background: rgba(255,255,255,.05);
+    border-color: rgba(255,255,255,.12);
+    transform: translateY(-1px);
   }
 
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
+  /* ── Form ── */
   .input {
-    @apply w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10
-      text-white placeholder-white/30 text-sm
-      focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50
-      transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-xl text-sm text-white
+           placeholder-white/30 transition-all duration-150 outline-none;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    min-height: 48px;
   }
-
+  .input:focus {
+    border-color: rgba(244,196,48,.5);
+    box-shadow: 0 0 0 3px rgba(244,196,48,.1);
+  }
   .label {
-    @apply block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wide;
+    @apply block text-xs font-bold uppercase tracking-widest mb-1.5;
+    color: rgba(255,255,255,.4);
+    letter-spacing: .08em;
   }
 
-  /* Analysis bar */
-  .eval-bar {
-    @apply w-3 rounded-full overflow-hidden border border-white/10 relative;
-    height: 300px;
+  /* ── Badge ── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold;
   }
 
-  .eval-bar-fill {
-    @apply absolute bottom-0 w-full bg-white transition-all duration-500;
-  }
+  /* ── Divider ── */
+  .hr { border-top: 1px solid rgba(255,255,255,.07); }
 
-  /* Move list */
-  .move-item {
-    @apply px-2 py-1 rounded text-sm cursor-pointer transition-colors duration-150;
-  }
+  /* ── Section wrapper ── */
+  .section { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
-  .move-item:hover {
-    @apply bg-white/5;
+  /* ── Move list ── */
+  .move-btn {
+    @apply flex-1 text-left px-2 py-1 rounded-lg text-sm transition-colors;
+    min-height: 32px;
   }
-
-  .move-item.active {
-    @apply bg-accent/20 text-accent;
-  }
-
-  /* Chessboard custom styles */
-  .chess-wrapper .cg-wrap {
-    border-radius: 4px;
-    overflow: hidden;
+  .move-btn:hover { background: rgba(255,255,255,.06); color: white; }
+  .move-btn.active {
+    color: #f4c430;
+    font-weight: 700;
+    background: rgba(244,196,48,.1);
   }
 }
 
+/* ─── chessboard.js overrides ────────────────────────────────── */
+.board-b72b1 {
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+
+/* DO NOT add overflow:hidden — it clips corner pieces */
+
+.white-1e1d7 { background-color: var(--board-light) !important; }
+.black-3c85d { background-color: var(--board-dark)  !important; }
+
+/* square highlights */
+.sq-hl-from { background-color: rgba(244,196,48,.25) !important; }
+.sq-hl-to   { background-color: rgba(244,196,48,.35) !important; }
+.sq-hl-sel  { background-color: rgba(244,196,48,.4) !important; box-shadow: inset 0 0 0 3px rgba(244,196,48,.8) !important; }
+.sq-hl-check { background-color: rgba(239,68,68,.45) !important; box-shadow: inset 0 0 0 3px rgba(239,68,68,.9) !important; }
+.sq-hl-legal::after {
+  content: '';
+  display: block;
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: var(--legal);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.notation-322f9 {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  opacity: .5 !important;
+}
+
+.piece-417db { cursor: grab !important; }
+.piece-417db:active { cursor: grabbing !important; }
+
+/* ─── Utilities ──────────────────────────────────────────────── */
 @layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent;
+  .text-gold-grad {
+    background: linear-gradient(135deg, #f4c430, #f9d760);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-
-  .glass {
-    @apply bg-white/5 backdrop-blur-sm border border-white/10;
+  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .bg-glass {
+    background: rgba(255,255,255,.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
-
-  .divider {
-    @apply border-t border-white/5;
-  }
-}
-
-/* Kids page overrides */
-.kids-mode {
-  font-family: 'Nunito', sans-serif;
-}
-
-.kids-mode h1, .kids-mode h2 {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
 }
