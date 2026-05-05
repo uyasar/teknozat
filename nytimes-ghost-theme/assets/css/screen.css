@@ -295,6 +295,7 @@ button {
     flex-wrap: nowrap;
     gap: 0;
     flex: 1;
+    flex-wrap: nowrap;
 }
 
 .nav-list .nav-current > a {
@@ -2060,7 +2061,392 @@ button {
 }
 
 /* --------------------------------------------------------------------------
-   19. Print
+   19. Announcement Bar
+   -------------------------------------------------------------------------- */
+
+.gh-announcement-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--color-black);
+    color: var(--color-white);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    position: relative;
+}
+
+.gh-announcement-bar.dark {
+    background: var(--color-black);
+}
+
+.gh-announcement-bar.light {
+    background: var(--color-gray-100);
+    color: var(--color-black);
+    border-bottom: var(--border);
+}
+
+.gh-announcement-bar.accent {
+    background: var(--color-red);
+}
+
+.gh-announcement-bar-content {
+    text-align: center;
+}
+
+.gh-announcement-bar-content a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.gh-announcement-close {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: inherit;
+    opacity: 0.7;
+    padding: 4px;
+    flex-shrink: 0;
+    transition: opacity var(--transition);
+}
+
+.gh-announcement-close:hover {
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   20. Paywall
+   -------------------------------------------------------------------------- */
+
+.post-paywall {
+    position: relative;
+    margin-top: -120px;
+    padding-top: 120px;
+    background: linear-gradient(to bottom, transparent, var(--color-white) 60%);
+}
+
+.post-paywall-inner {
+    border-top: var(--border-dark);
+    padding: 32px 24px;
+    text-align: center;
+    background: var(--color-white);
+}
+
+.post-paywall-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+}
+
+.post-paywall-desc {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-gray-600);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.post-paywall-btn {
+    font-size: 0.8rem;
+    padding: 10px 24px;
+    margin-bottom: 14px;
+}
+
+.post-paywall-signin {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    color: var(--color-gray-500);
+}
+
+.post-paywall-signin a {
+    color: var(--color-blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   21. Ghost Koenig — wide/full width cards
+   -------------------------------------------------------------------------- */
+
+.gh-content .kg-width-wide {
+    margin-left: calc(50% - 50vw + 16px);
+    margin-right: calc(50% - 50vw + 16px);
+    max-width: min(1100px, calc(100vw - 32px));
+    width: min(1100px, calc(100vw - 32px));
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.gh-content .kg-width-full {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    max-width: 100vw;
+}
+
+.gh-content .kg-width-full img {
+    width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   22. Ghost Search
+   -------------------------------------------------------------------------- */
+
+.gh-search-modal {
+    font-family: var(--font-sans);
+}
+
+.gh-search-input {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    border: none;
+    border-bottom: 2px solid var(--color-black);
+    border-radius: 0;
+    padding: 8px 4px;
+}
+
+.gh-search-result-title {
+    font-family: var(--font-serif);
+    font-weight: 700;
+}
+
+/* Ghost native search button */
+.gh-search-btn,
+button[data-ghost-search] {
+    color: var(--color-gray-600);
+    padding: 8px;
+    flex-shrink: 0;
+    transition: color var(--transition);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.gh-search-btn:hover,
+button[data-ghost-search]:hover {
+    color: var(--color-black);
+}
+
+/* --------------------------------------------------------------------------
+   23. Dark Mode Toggle Button
+   -------------------------------------------------------------------------- */
+
+.dark-mode-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: var(--color-gray-600);
+    transition: color var(--transition);
+    flex-shrink: 0;
+}
+
+.dark-mode-toggle:hover {
+    color: var(--color-black);
+}
+
+.dark-mode-toggle .icon-sun,
+.dark-mode-toggle .icon-moon {
+    display: none;
+}
+
+/* Light mode: show moon (click to go dark) */
+html:not(.dark-mode) .dark-mode-toggle .icon-moon {
+    display: block;
+}
+
+/* Dark mode: show sun (click to go light) */
+html.dark-mode .dark-mode-toggle .icon-sun {
+    display: block;
+}
+
+/* --------------------------------------------------------------------------
+   24. Dark Mode
+   -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --color-black: #f0f0f0;
+        --color-white: #111111;
+        --color-gray-100: #1c1c1c;
+        --color-gray-200: #2a2a2a;
+        --color-gray-300: #3a3a3a;
+        --color-gray-400: #666666;
+        --color-gray-500: #888888;
+        --color-gray-600: #aaaaaa;
+        --color-gray-700: #cccccc;
+        --border: 1px solid #2a2a2a;
+        --border-dark: 3px solid #f0f0f0;
+    }
+
+    html:not(.light-mode) .site-footer {
+        background: #0a0a0a;
+    }
+
+    html:not(.light-mode) .post-paywall {
+        background: linear-gradient(to bottom, transparent, #111111 60%);
+    }
+
+    html:not(.light-mode) .post-paywall-inner {
+        background: #111111;
+    }
+
+    html:not(.light-mode) .gh-announcement-bar.light {
+        background: #1c1c1c;
+        color: #f0f0f0;
+    }
+
+    html:not(.light-mode) .dark-mode-toggle .icon-sun {
+        display: block;
+    }
+
+    html:not(.light-mode) .dark-mode-toggle .icon-moon {
+        display: none;
+    }
+}
+
+html.dark-mode {
+    --color-black: #f0f0f0;
+    --color-white: #111111;
+    --color-gray-100: #1c1c1c;
+    --color-gray-200: #2a2a2a;
+    --color-gray-300: #3a3a3a;
+    --color-gray-400: #666666;
+    --color-gray-500: #888888;
+    --color-gray-600: #aaaaaa;
+    --color-gray-700: #cccccc;
+    --border: 1px solid #2a2a2a;
+    --border-dark: 3px solid #f0f0f0;
+}
+
+html.dark-mode .site-footer {
+    background: #0a0a0a;
+}
+
+html.dark-mode .post-paywall {
+    background: linear-gradient(to bottom, transparent, #111111 60%);
+}
+
+html.dark-mode .post-paywall-inner {
+    background: #111111;
+}
+
+html.dark-mode .gh-announcement-bar.light {
+    background: #1c1c1c;
+    color: #f0f0f0;
+}
+
+html.dark-mode .dark-mode-toggle .icon-sun {
+    display: block;
+}
+
+html.dark-mode .dark-mode-toggle .icon-moon {
+    display: none;
+}
+
+/* --------------------------------------------------------------------------
+   25. Modern Improvements — hover effects, transitions, polish
+   -------------------------------------------------------------------------- */
+
+/* Smooth image loading */
+img {
+    transition: opacity 0.3s ease;
+}
+
+/* Post card hover lift */
+.post-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 2px;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.post-card-small:hover .post-card-small-title {
+    color: var(--color-gray-600);
+}
+
+/* Lead story title smoother hover */
+.lead-main-title-link,
+.lead-secondary-title-link {
+    transition: color 0.2s ease;
+}
+
+/* Better focus ring */
+:focus-visible {
+    outline: 2px solid var(--color-red);
+    outline-offset: 3px;
+}
+
+/* Smoother button transitions */
+.btn {
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Share link hover smoother */
+.post-share-link {
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Sidebar tag link hover */
+.sidebar-tag-link {
+    transition: color 0.2s ease, padding-left 0.15s ease;
+}
+
+.sidebar-tag-link:hover {
+    padding-left: 4px;
+}
+
+/* Footer nav link hover */
+.footer-nav-list > .nav-item > .nav-link,
+.footer-nav-list > li > a {
+    transition: color 0.2s ease;
+}
+
+/* Author card hover */
+.post-author-card {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-author-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Related post card image zoom */
+.related-posts-grid .post-card-image-link {
+    overflow: hidden;
+}
+
+.related-posts-grid .post-card-image {
+    transition: transform 0.3s ease;
+}
+
+.related-posts-grid .post-card:hover .post-card-image {
+    transform: scale(1.03);
+}
+
+/* --------------------------------------------------------------------------
+   26. Print
    -------------------------------------------------------------------------- */
 
 @media print {

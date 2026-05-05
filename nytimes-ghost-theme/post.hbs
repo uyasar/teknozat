@@ -85,9 +85,10 @@
                     {{#if @site.members_enabled}}
                     <div class="post-paywall">
                         <div class="post-paywall-inner">
-                            <h2 class="post-paywall-title">Subscribe to continue reading</h2>
-                            <p class="post-paywall-desc">Become a member to get access to this and all future articles.</p>
-                            <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe">Subscribe Now</a>
+                            <h3 class="post-paywall-title">Continue Reading</h3>
+                            <p class="post-paywall-desc">Subscribe to read the full article and support quality journalism.</p>
+                            <a href="{{@site.url}}/#/portal/signup" class="btn btn-subscribe post-paywall-btn">Subscribe Now</a>
+                            <p class="post-paywall-signin">Already a subscriber? <a href="{{@site.url}}/#/portal/signin">Sign in</a></p>
                         </div>
                     </div>
                     {{/if}}

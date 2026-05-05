@@ -118,11 +118,54 @@
 
     // Announcement bar dismiss
     function initAnnouncementBar() {
-        var btn = document.querySelector('[data-announcement-close]');
         var bar = document.getElementById('gh-announcement-bar');
-        if (!btn || !bar) return;
-        btn.addEventListener('click', function () {
-            bar.style.display = 'none';
+        if (!bar) return;
+
+        var closeBtn = bar.querySelector('[data-announcement-close]');
+        if (!closeBtn) return;
+
+        closeBtn.addEventListener('click', function () {
+            bar.style.transition = 'opacity 0.2s ease, max-height 0.3s ease';
+            bar.style.opacity = '0';
+            bar.style.maxHeight = '0';
+            bar.style.overflow = 'hidden';
+            setTimeout(function () { bar.remove(); }, 300);
+        });
+    }
+
+    // Dark mode toggle
+    function initDarkMode() {
+        var html = document.documentElement;
+        var toggle = document.getElementById('dark-mode-toggle');
+
+        // On load: apply saved preference or system preference
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+            html.classList.add('dark-mode');
+            html.classList.remove('light-mode');
+        } else if (saved === 'light') {
+            html.classList.add('light-mode');
+            html.classList.remove('dark-mode');
+        }
+        // If no saved preference, CSS media query handles it automatically
+
+        if (!toggle) return;
+
+        toggle.addEventListener('click', function () {
+            var isDark = html.classList.contains('dark-mode');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (isDark) {
+                // Switch to light
+                html.classList.remove('dark-mode');
+                html.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // Switch to dark
+                html.classList.add('dark-mode');
+                html.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            }
         });
     }
 
@@ -135,5 +178,6 @@
         initLazyImages();
         initExternalLinks();
         initAnnouncementBar();
+        initDarkMode();
     });
 }());

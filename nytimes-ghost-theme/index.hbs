@@ -2,7 +2,7 @@
 
 <div class="home-container">
 
-    {{! Featured / Lead Story Section — toggled by custom setting }}
+    {{! Featured / Lead Story Section }}
     {{#if @custom.show_featured_section}}
     {{#get "posts" limit="5" include="authors,tags"}}
     <section class="home-lead-section">
