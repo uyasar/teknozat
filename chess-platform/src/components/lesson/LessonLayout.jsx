@@ -1,21 +1,24 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { Chess } from 'chess.js'
 import {
   ChevronLeft, ChevronRight, SkipBack, SkipForward,
-  FlipHorizontal, Bot, User, BarChart2, List, Puzzle,
+  FlipHorizontal, Bot, User, BarChart2, List, Puzzle, Crown,
 } from 'lucide-react'
 import ChessBoard from '../chess/ChessBoard'
 import MoveList from '../chess/MoveList'
 import AnalysisPanel from '../chess/AnalysisPanel'
 import PuzzlePanel from '../chess/PuzzlePanel'
+import MasterGamesPanel from '../chess/MasterGamesPanel'
 import { useChessGame } from '../../hooks/useChessGame'
 import { useBoardWidth } from '../../hooks/useBoardWidth'
+import { FAMOUS_GAMES } from '../../data/mockData'
 import clsx from 'clsx'
 
 const TABS = [
   { id: 'moves',    label: 'Hamleler', icon: List      },
   { id: 'analysis', label: 'Analiz',   icon: BarChart2 },
   { id: 'puzzle',   label: 'Bulmaca',  icon: Puzzle    },
+  { id: 'masters',  label: 'Ustalar',  icon: Crown     },
 ]
 
 export default function LessonLayout({ lesson }) {
@@ -34,6 +37,8 @@ export default function LessonLayout({ lesson }) {
   const [legalMoves,     setLegalMoves]    = useState([])
   const [deviationInfo,  setDeviationInfo] = useState(null)
   const [engineBestMove, setEngineBestMove]= useState(null)
+  const [masterGame,     setMasterGame]    = useState(null)
+  const [lessonMoves,    setLessonMoves]   = useState([])
 
   // ── Puzzle state ─────────────────────────────────────────────
   const puzzles        = lesson?.puzzles ?? []
@@ -57,7 +62,13 @@ export default function LessonLayout({ lesson }) {
   useEffect(() => { resetPuzzle() }, [puzzleIdx, resetPuzzle])
 
   useEffect(() => {
-    if (lesson?.pgn) loadPgn(lesson.pgn)
+    if (!lesson?.pgn) return
+    loadPgn(lesson.pgn)
+    try {
+      const g = new Chess()
+      g.loadPgn(lesson.pgn)
+      setLessonMoves(g.history())
+    } catch { setLessonMoves([]) }
   }, [lesson?.pgn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const boardFen = activeTab === 'puzzle' && currentPuzzle
@@ -144,6 +155,34 @@ export default function LessonLayout({ lesson }) {
   }, [activeTab, currentPuzzle, puzzleFen, puzzleMvIdx, aiMode, lesson?.pgn, currentIndex, makeMove])
 
   useEffect(() => { handleDropRef.current = handleDrop }, [handleDrop])
+
+  // Filter famous games by shared opening prefix (first 2 full moves)
+  const matchedGames = useMemo(() => {
+    if (lessonMoves.length === 0) return FAMOUS_GAMES
+    const prefix = lessonMoves.slice(0, Math.min(2, lessonMoves.length))
+    const matched = FAMOUS_GAMES.filter(game => {
+      try {
+        const g = new Chess()
+        g.loadPgn(game.pgn)
+        const gm = g.history()
+        return prefix.every((m, i) => gm[i] === m)
+      } catch { return false }
+    })
+    return matched.length > 0 ? matched : FAMOUS_GAMES
+  }, [lessonMoves])
+
+  const handleSelectMasterGame = useCallback((game) => {
+    loadPgn(game.pgn)
+    setMasterGame(game)
+    setActiveTab('moves')
+    setEngineBestMove(null)
+  }, [loadPgn])
+
+  const handleReturnToLesson = useCallback(() => {
+    if (lesson?.pgn) loadPgn(lesson.pgn)
+    setMasterGame(null)
+    setEngineBestMove(null)
+  }, [lesson?.pgn, loadPgn])
 
   // ── Square click (piece selection + puzzle click-to-move) ────
   const handleSquareClick = useCallback((sq) => {
@@ -319,6 +358,20 @@ export default function LessonLayout({ lesson }) {
           ))}
         </div>
 
+        {/* Master game banner */}
+        {masterGame && activeTab !== 'masters' && (
+          <div className="flex items-center justify-between rounded-xl px-4 py-2.5 text-xs"
+            style={{background:'rgba(244,196,48,.07)',border:'1px solid rgba(244,196,48,.2)'}}>
+            <span className="text-gold/80 font-semibold truncate">
+              ♛ {masterGame.white} – {masterGame.black} ({masterGame.year})
+            </span>
+            <button onClick={handleReturnToLesson}
+              className="shrink-0 ml-3 text-white/40 hover:text-white transition-colors">
+              ← Derse dön
+            </button>
+          </div>
+        )}
+
         {/* Tab content */}
         <div className="animate-fade-in">
           {activeTab === 'moves' && (
@@ -349,6 +402,14 @@ export default function LessonLayout({ lesson }) {
               onHint={() => setHintUsed(true)}
               onReset={resetPuzzle}
               onNext={puzzleIdx < puzzles.length - 1 ? () => setPuzzleIdx(i => i + 1) : undefined}
+            />
+          )}
+          {activeTab === 'masters' && (
+            <MasterGamesPanel
+              games={matchedGames}
+              selectedId={masterGame?.id}
+              onSelect={handleSelectMasterGame}
+              onReturn={masterGame ? handleReturnToLesson : null}
             />
           )}
         </div>
