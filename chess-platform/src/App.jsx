@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Cocuk from './pages/Cocuk'
+import Openings from './pages/Openings'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/giris" element={<Login />} />
                 <Route path="/kayit" element={<Login isRegister />} />
                 <Route path="/cocuk" element={<Cocuk />} />
+                <Route path="/acilislar" element={<Openings />} />
               </Routes>
             </div>
             <Footer />

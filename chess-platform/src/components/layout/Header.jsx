@@ -27,9 +27,10 @@ export default function Header() {
   }, [])
 
   const navLinks = [
-    { to: '/',        label: 'Ana Sayfa', end: true },
-    { to: '/dersler', label: 'Dersler' },
-    { to: '/cocuk',   label: '♟ Çocuklar' },
+    { to: '/',          label: 'Ana Sayfa', end: true },
+    { to: '/dersler',   label: 'Dersler' },
+    { to: '/acilislar', label: 'Açılışlar' },
+    { to: '/cocuk',     label: '♟ Çocuklar' },
   ]
 
   const navCls = (active) =>
