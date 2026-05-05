@@ -44,11 +44,13 @@ export default function LessonLayout({ lesson }) {
   const [hintUsed,     setHintUsed]    = useState(false)
   const [solvedIds,    setSolvedIds]   = useState([])
 
-  const currentPuzzle = puzzles[puzzleIdx] ?? null
+  const currentPuzzle  = puzzles[puzzleIdx] ?? null
+  const handleDropRef  = useRef(null)
 
   const resetPuzzle = useCallback(() => {
     setPuzzleMvIdx(0); setPuzzleFen(null)
     setPuzzleStatus('idle'); setAttempts(0); setHintUsed(false)
+    setSelectedSq(null); setLegalMoves([])
   }, [])
 
   useEffect(() => { resetPuzzle() }, [puzzleIdx, resetPuzzle])
@@ -140,9 +142,34 @@ export default function LessonLayout({ lesson }) {
     return res?.fen ?? null
   }, [activeTab, currentPuzzle, puzzleFen, puzzleMvIdx, aiMode, lesson?.pgn, currentIndex, makeMove])
 
-  // ── Square click (piece selection) ──────────────────────────
+  useEffect(() => { handleDropRef.current = handleDrop }, [handleDrop])
+
+  // ── Square click (piece selection + puzzle click-to-move) ────
   const handleSquareClick = useCallback((sq) => {
+    // ── Puzzle click-to-move ─────────────────────────────────
+    if (activeTab === 'puzzle' && currentPuzzle && puzzleStatus !== 'solved') {
+      const base = puzzleFen ?? currentPuzzle.fen
+      const g = new Chess(base)
+      const piece = g.get(sq)
+
+      if (selectedSq && selectedSq !== sq) {
+        handleDropRef.current?.(selectedSq, sq)
+        setSelectedSq(null)
+        setLegalMoves([])
+        return
+      }
+      if (piece?.color === g.turn()) {
+        setSelectedSq(sq)
+        setLegalMoves(g.moves({ square: sq, verbose: true }).map(m => m.to))
+      } else {
+        setSelectedSq(null)
+        setLegalMoves([])
+      }
+      return
+    }
+
     if (activeTab === 'puzzle') return
+
     const piece = game.get(sq)
 
     if (selectedSq && selectedSq !== sq) {
@@ -164,7 +191,7 @@ export default function LessonLayout({ lesson }) {
       setSelectedSq(null)
       setLegalMoves([])
     }
-  }, [activeTab, game, selectedSq, getLegalMovesFrom, makeMove])
+  }, [activeTab, game, selectedSq, getLegalMovesFrom, makeMove, currentPuzzle, puzzleStatus, puzzleFen])
 
   const hasPuzzles = puzzles.length > 0
   const inCheck    = getCheckSq(boardFen)
@@ -209,7 +236,7 @@ export default function LessonLayout({ lesson }) {
           <ChessBoard
             fen={boardFen}
             onPieceDrop={handleDrop}
-            onSquareClick={activeTab !== 'puzzle' ? handleSquareClick : undefined}
+            onSquareClick={handleSquareClick}
             orientation={orientation}
             boardWidth={boardWidth}
             lastMove={activeTab === 'puzzle' ? null : lastMove}

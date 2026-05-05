@@ -19,12 +19,13 @@ const ChessBoard = memo(function ChessBoard({
   legalMoves    = [],
   inCheck       = null,
 }) {
-  const containerRef = useRef(null)
-  const boardRef     = useRef(null)
-  const dropRef      = useRef(onPieceDrop)
-  const clickRef     = useRef(onSquareClick)
-  const fenAfterRef  = useRef(null)
-  const fenRef       = useRef(fen)
+  const containerRef    = useRef(null)
+  const boardRef        = useRef(null)
+  const dropRef         = useRef(onPieceDrop)
+  const clickRef        = useRef(onSquareClick)
+  const fenAfterRef     = useRef(null)
+  const fenRef          = useRef(fen)
+  const onDropClickRef  = useRef(null) // tracks which square onDrop already fired click for
 
   useEffect(() => { dropRef.current  = onPieceDrop  }, [onPieceDrop])
   useEffect(() => { clickRef.current = onSquareClick }, [onSquareClick])
@@ -40,7 +41,14 @@ const ChessBoard = memo(function ChessBoard({
       orientation,
       pieceTheme: PIECE_CDN,
       onDrop(source, target) {
-        if (disabled || source === target) return 'snapback'
+        if (disabled) return 'snapback'
+        if (source === target) {
+          // piece was clicked (not dragged) — fire click handler here;
+          // the jQuery click event also fires afterward, use the ref to suppress it
+          onDropClickRef.current = source
+          clickRef.current?.(source)
+          return 'snapback'
+        }
         const newFen = dropRef.current?.(source, target)
         if (!newFen) return 'snapback'
         fenAfterRef.current = newFen
@@ -62,7 +70,13 @@ const ChessBoard = memo(function ChessBoard({
         const sq = Array.from(this.classList)
           .find(c => /^square-[a-h][1-8]$/.test(c))
           ?.replace('square-', '')
-        if (sq) clickRef.current?.(sq)
+        if (!sq) return
+        // onDrop(source, source) already fired click for piece-clicks; skip duplicate
+        if (onDropClickRef.current === sq) {
+          onDropClickRef.current = null
+          return
+        }
+        clickRef.current?.(sq)
       })
     }
 

@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-// The nmrugg/stockfish.js worker requires a hash specifying the WASM path and ",worker" mode
-const SF_WORKER_URL = '/stockfish.js#/stockfish-nnue-16-single.wasm,worker'
-
 export function useStockfish() {
   const workerRef   = useRef(null)
   const [ready, setReady]         = useState(false)
@@ -45,7 +42,7 @@ export function useStockfish() {
   useEffect(() => {
     let worker
     try {
-      worker = new Worker(SF_WORKER_URL)
+      worker = new Worker('/stockfish.js')
     } catch (e) {
       console.warn('Stockfish worker failed to load:', e)
       return
