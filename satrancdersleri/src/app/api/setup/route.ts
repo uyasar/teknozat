@@ -3,7 +3,10 @@ import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
 // One-time setup endpoint — only runs if database is empty
-export async function POST() {
+export async function GET() { return run() }
+export async function POST() { return run() }
+
+async function run() {
   const existingUser = await prisma.user.findFirst()
   if (existingUser) {
     return NextResponse.json({ error: 'Veritabanı zaten kurulu' }, { status: 400 })
