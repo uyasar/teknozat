@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
-    "build": "prisma migrate deploy && next build",
+    "build": "prisma db push && next build",
     "start": "next start",
     "lint": "eslint",
     "seed": "ts-node --project tsconfig.json -e \"require('tsconfig-paths/register'); require('./prisma/seed.ts')\""
