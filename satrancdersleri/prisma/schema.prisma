@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum CourseType {
+  ADULT
+  CHILD
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum BoardTheme {
+  CLASSIC
+  GREEN
+  BLUE
+  NIGHT
+  PINK
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String     @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role       @default(USER)
+  boardTheme    BoardTheme @default(CLASSIC)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  enrollments  Enrollment[]
+  progress     LessonProgress[]
+  puzzleSolves PuzzleSolve[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Course {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String     @db.Text
+  type        CourseType @default(ADULT)
+  level       Level      @default(BEGINNER)
+  thumbnail   String?
+  featured    Boolean    @default(false)
+  published   Boolean    @default(false)
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@map("courses")
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  courseId    String
+  title       String
+  slug        String
+  description String?  @db.Text
+  videoUrl    String?
+  videoType   String?
+  order       Int      @default(0)
+  published   Boolean  @default(false)
+  isOpening   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  puzzles     Puzzle[]
+  famousGames FamousGame[]
+  progress    LessonProgress[]
+
+  @@unique([courseId, slug])
+  @@map("lessons")
+}
+
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  watchTime   Int       @default(0)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_progress")
+}
+
+model Puzzle {
+  id          String   @id @default(cuid())
+  lessonId    String
+  fen         String
+  solution    String[]
+  hint        String?
+  description String?  @db.Text
+  difficulty  Int      @default(1)
+  order       Int      @default(0)
+
+  lesson Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  solves PuzzleSolve[]
+
+  @@map("puzzles")
+}
+
+model PuzzleSolve {
+  id        String   @id @default(cuid())
+  userId    String
+  puzzleId  String
+  solved    Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  puzzle Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, puzzleId])
+  @@map("puzzle_solves")
+}
+
+model FamousGame {
+  id          String  @id @default(cuid())
+  lessonId    String
+  whitePlayer String
+  blackPlayer String
+  year        Int?
+  tournament  String?
+  result      String?
+  pgn         String  @db.Text
+  description String? @db.Text
+  order       Int     @default(0)
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("famous_games")
+}
