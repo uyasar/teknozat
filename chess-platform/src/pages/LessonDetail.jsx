@@ -21,28 +21,28 @@ export default function LessonDetail() {
   }
 
   return (
-    <main className="pt-24 pb-20 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Link to="/dersler" className="btn-ghost gap-1.5 text-sm">
-            <ArrowLeft size={14} /> Kurslar
-          </Link>
-          <span className="text-white/20">/</span>
-          <span className="text-white/40 text-sm truncate">{course.title}</span>
-        </div>
-
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-display font-bold text-3xl">{course.title}</h1>
+    <main className="pt-16 pb-20 min-h-screen" style={{background:'#f7f6f3'}}>
+      {/* Breadcrumb header */}
+      <div className="bg-white border-b border-stone-200 pt-6 pb-6 mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 text-sm text-stone-500 mb-4">
+            <Link to="/dersler" className="flex items-center gap-1 hover:text-chess transition-colors">
+              <ArrowLeft size={13} /> Kurslar
+            </Link>
+            <span className="text-stone-300">/</span>
+            <span className="text-stone-700 font-medium truncate">{course.title}</span>
           </div>
-          <div className="flex items-center gap-4 text-sm text-white/40">
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-stone-900">{course.title}</h1>
+          <div className="flex items-center gap-4 text-sm text-stone-500 mt-2">
             <span className="flex items-center gap-1.5"><BookOpen size={13} /> {course.lessons} ders</span>
             <span className="flex items-center gap-1.5"><Clock size={13} /> {course.duration}</span>
-            <span className="text-white/20">|</span>
+            <span className="text-stone-300">·</span>
             <span>{course.instructor}</span>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <LessonLayout lesson={lesson} />
       </div>
     </main>

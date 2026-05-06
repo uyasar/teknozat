@@ -1,60 +1,65 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, X, Settings, LogOut, LayoutDashboard, Shield } from 'lucide-react'
+import { Menu, X, Settings, LogOut, LayoutDashboard, Shield, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import SettingsModal from '../ui/SettingsModal'
 
 export default function Header() {
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [dropOpen,   setDropOpen]   = useState(false)
+  const [mobileOpen, setMobileOpen]   = useState(false)
+  const [dropOpen,   setDropOpen]     = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const dropRef = useRef(null)
 
-  // Close dropdown on outside click or ESC
   useEffect(() => {
     const onMouse = (e) => { if (!dropRef.current?.contains(e.target)) setDropOpen(false) }
-    const onKey   = (e) => {
-      if (e.key === 'Escape') { setDropOpen(false); setMobileOpen(false) }
-    }
+    const onKey   = (e) => { if (e.key === 'Escape') { setDropOpen(false); setMobileOpen(false) } }
     document.addEventListener('mousedown', onMouse)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onMouse)
-      document.removeEventListener('keydown', onKey)
-    }
+    document.addEventListener('keydown',   onKey)
+    return () => { document.removeEventListener('mousedown', onMouse); document.removeEventListener('keydown', onKey) }
   }, [])
 
   const navLinks = [
-    { to: '/',          label: 'Ana Sayfa', end: true },
+    { to: '/',          label: 'Ana Sayfa',  end: true },
     { to: '/dersler',   label: 'Dersler' },
     { to: '/acilislar', label: 'Açılışlar' },
-    { to: '/cocuk',     label: '♟ Çocuklar' },
+    { to: '/cocuk',     label: 'Çocuklar' },
   ]
 
   const navCls = (active) =>
-    `block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors min-h-[44px] flex items-center
-     ${active ? 'text-gold bg-gold/8' : 'text-white/55 hover:text-white hover:bg-white/5'}`
+    `px-4 py-2 rounded-lg text-sm font-medium transition-colors min-h-[40px] flex items-center
+     ${active
+       ? 'text-chess bg-chess-subtle font-semibold'
+       : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+     }`
 
-  const dropItemCls = 'flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors min-h-[48px]'
+  const dropItemCls = 'flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors text-left'
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-50 bg-bg-base/85 backdrop-blur-xl border-b border-white/5">
+      <header className="fixed top-0 inset-x-0 z-50 bg-white border-b border-stone-200"
+        style={{boxShadow:'0 1px 3px rgba(0,0,0,.06)'}}>
         <div className="section h-16 flex items-center justify-between gap-4">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center
-              text-bg-base font-bold text-lg select-none group-hover:bg-gold-light transition-colors">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xl select-none"
+              style={{background:'linear-gradient(135deg,#166534,#15803d)',boxShadow:'0 2px 8px rgba(22,101,52,.3)'}}>
               ♛
             </div>
-            <span className="font-display font-bold text-[15px] tracking-tight">satrancdersleri</span>
+            <div className="leading-none">
+              <span className="font-display font-bold text-[15px] tracking-tight text-stone-900 block">
+                satrançdersleri
+              </span>
+              <span className="text-[10px] text-stone-400 font-sans tracking-wide uppercase">
+                chess academy
+              </span>
+            </div>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-0.5 flex-1">
+          <nav className="hidden md:flex items-center gap-0.5 flex-1 ml-4">
             {navLinks.map(({ to, label, end }) => (
               <NavLink key={to} to={to} end={end}
                 className={({ isActive }) => navCls(isActive)}>
@@ -71,42 +76,41 @@ export default function Header() {
                   onClick={() => setDropOpen(p => !p)}
                   aria-expanded={dropOpen}
                   aria-haspopup="true"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl
-                    hover:bg-white/5 transition-colors min-h-[44px]"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-stone-100 transition-colors min-h-[44px]"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gold/15 border border-gold/25
-                    flex items-center justify-center text-gold text-xs font-bold shrink-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    style={{background:'linear-gradient(135deg,#166534,#15803d)'}}>
                     {user.name[0]}
                   </div>
-                  <span className="hidden sm:block text-sm text-white/70 max-w-[120px] truncate">
+                  <span className="hidden sm:block text-sm text-stone-700 max-w-[100px] truncate font-medium">
                     {user.name.split(' ')[0]}
                   </span>
+                  <ChevronDown size={13} className={`hidden sm:block text-stone-400 transition-transform ${dropOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {dropOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl
-                    bg-bg-elevated border border-white/8 shadow-2xl shadow-black/40
-                    py-1.5 animate-fade-in z-50">
+                  <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-white
+                    border border-stone-200 shadow-xl py-1.5 animate-fade-in z-50">
                     <Link to="/dashboard" onClick={() => setDropOpen(false)}
-                      className={`${dropItemCls} text-white/60 hover:text-white hover:bg-white/5`}>
+                      className={`${dropItemCls} text-stone-600 hover:text-stone-900 hover:bg-stone-50`}>
                       <LayoutDashboard size={15} /> Dashboard
                     </Link>
                     {isAdmin && (
                       <Link to="/admin" onClick={() => setDropOpen(false)}
-                        className={`${dropItemCls} text-white/60 hover:text-white hover:bg-white/5`}>
+                        className={`${dropItemCls} text-stone-600 hover:text-stone-900 hover:bg-stone-50`}>
                         <Shield size={15} /> Admin Panel
                       </Link>
                     )}
                     <button
                       onClick={() => { setSettingsOpen(true); setDropOpen(false) }}
-                      className={`${dropItemCls} text-white/60 hover:text-white hover:bg-white/5`}
+                      className={`${dropItemCls} text-stone-600 hover:text-stone-900 hover:bg-stone-50`}
                     >
                       <Settings size={15} /> Tahta Ayarları
                     </button>
-                    <div className="hr my-1.5" />
+                    <div className="hr my-1" />
                     <button
                       onClick={() => { logout(); navigate('/'); setDropOpen(false) }}
-                      className={`${dropItemCls} text-red-400/70 hover:text-red-400 hover:bg-red-500/5`}
+                      className={`${dropItemCls} text-red-600 hover:text-red-700 hover:bg-red-50`}
                     >
                       <LogOut size={15} /> Çıkış yap
                     </button>
@@ -115,14 +119,14 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <Link to="/giris" className="btn-ghost px-4 py-2">Giriş</Link>
-                <Link to="/kayit" className="btn-primary px-4 py-2">Üye ol</Link>
+                <Link to="/giris" className="btn-ghost px-4 py-2 text-sm">Giriş</Link>
+                <Link to="/kayit" className="btn-primary px-5 py-2.5 text-sm">Üye Ol</Link>
               </>
             )}
 
             {/* Hamburger */}
             <button
-              className="btn-icon md:hidden"
+              className="btn-icon md:hidden text-stone-600"
               onClick={() => setMobileOpen(p => !p)}
               aria-label={mobileOpen ? 'Menüyü kapat' : 'Menüyü aç'}
               aria-expanded={mobileOpen}
@@ -134,8 +138,7 @@ export default function Header() {
 
         {/* Mobile drawer */}
         {mobileOpen && (
-          <nav className="md:hidden border-t border-white/5 bg-bg-base/95
-            px-4 py-3 space-y-1 animate-fade-in">
+          <nav className="md:hidden border-t border-stone-200 bg-white px-4 py-3 space-y-1 animate-fade-in">
             {navLinks.map(({ to, label, end }) => (
               <NavLink key={to} to={to} end={end}
                 onClick={() => setMobileOpen(false)}
@@ -144,11 +147,11 @@ export default function Header() {
               </NavLink>
             ))}
             {!user && (
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-3 border-t border-stone-100 mt-2">
                 <Link to="/giris" onClick={() => setMobileOpen(false)}
-                  className="btn-secondary flex-1 justify-center">Giriş</Link>
+                  className="btn-secondary flex-1 justify-center text-sm">Giriş</Link>
                 <Link to="/kayit" onClick={() => setMobileOpen(false)}
-                  className="btn-primary flex-1 justify-center">Üye ol</Link>
+                  className="btn-primary flex-1 justify-center text-sm">Üye Ol</Link>
               </div>
             )}
           </nav>
