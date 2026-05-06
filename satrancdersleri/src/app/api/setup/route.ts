@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
 // One-time setup endpoint — only runs if database is empty
+export async function GET() { return POST() }
+
 export async function POST() {
   const existingUser = await prisma.user.findFirst()
   if (existingUser) {
